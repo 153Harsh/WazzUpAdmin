@@ -1,0 +1,469 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f6f7f9;
+}
+
+.header {
+  height: 50px;
+  background: #dff0d8;
+  border-bottom: 1px solid #c5dec0;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  font-weight: 600;
+  font-size: 18px;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 15px;
+  background: white;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.toolbar button {
+  padding: 6px 14px;
+  border: 1px solid #dcdcdc;
+  border-radius: 4px;
+  background: white;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.toolbar button:hover {
+  background: #f5f5f5;
+}
+
+.container {
+  display: grid;
+  grid-template-columns: 210px 1fr 300px;
+  height: calc(100vh - 92px);
+}
+
+/* Sidebar */
+
+.sidebar {
+  background: white;
+  border-right: 1px solid #e5e5e5;
+  padding: 12px;
+  overflow-y: auto;
+  margin-left: -14px;
+}
+
+.sidebar h4 {
+  margin: 0 0 14px;
+  font-size: 13px;
+  color: #555;
+}
+
+.sidebar-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+}
+
+.sidebar-item {
+  background: #dff0d8;
+  border: 1px solid #c5dec0;
+  border-radius: 4px;
+  padding: 12px 6px;
+  text-align: center;
+  cursor: grab;
+  font-size: 13px;
+  transition: 0.2s;
+}
+
+.sidebar-item:hover {
+  background: #d3e9cb;
+}
+
+/* Canvas */
+
+.canvas {
+  width: 100%;
+  height: 100%;
+  background: #fafafa;
+}
+
+/* Inspector */
+
+.inspector {
+  background: white;
+  border-left: 1px solid #e5e5e5;
+  padding: 16px;
+  overflow-y: auto;
+}
+
+.inspector h3 {
+  margin-top: 0;
+  font-size: 28px;
+  margin-bottom: 24px;
+}
+
+.inspector label {
+  display: block;
+  font-size: 13px;
+  margin-bottom: 5px;
+  color: #444;
+}
+
+.inspector input,
+.inspector textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 9px 10px;
+  border: 1px solid #d5d5d5;
+  border-radius: 3px;
+  margin-bottom: 14px;
+  font-size: 13px;
+}
+
+.inspector textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+/* React Flow */
+
+.react-flow__node {
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.react-flow__controls {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.react-flow__minimap {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* Preview */
+
+.preview-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.preview-modal {
+  width: 360px;
+  height: 700px;
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.preview-header {
+  background: #075e54;
+  color: white;
+  padding: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.preview-chat {
+  flex: 1;
+  overflow-y: auto;
+  background: #ece5dd;
+  padding: 15px;
+}
+
+.bot-message {
+  background: white;
+  padding: 10px 14px;
+  border-radius: 10px;
+  max-width: 75%;
+  margin-bottom: 10px;
+}
+
+.close-btn {
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.wa-media-card {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 18px;
+  padding: 18px;
+  min-width: 300px;
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.wa-media-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #d97706;
+  margin-bottom: 12px;
+}
+
+.wa-media-url {
+  font-size: 14px;
+  color: #111827;
+  margin-bottom: 8px;
+  word-break: break-word;
+}
+
+.wa-media-support {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.wa-template-card {
+
+  background: white;
+
+  border: 1px solid #ddd;
+
+  border-radius: 18px;
+
+  padding: 18px;
+
+  min-width: 280px;
+
+  box-shadow:
+    0 2px 8px rgba(0,
+      0,
+      0,
+      0.08);
+
+}
+
+.wa-template-title {
+
+  color: #6d28d9;
+
+  font-weight: 600;
+
+  margin-bottom: 12px;
+
+}
+
+.wa-template-name {
+
+  font-size: 14px;
+
+  margin-bottom: 8px;
+
+}
+
+.wa-template-info {
+
+  font-size: 13px;
+
+  color: #6b7280;
+
+}
+
+.wa-list-card {
+
+  background: white;
+
+  border: 1px solid #ddd;
+
+  border-radius: 18px;
+
+  padding: 18px;
+
+  min-width: 300px;
+
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, .08);
+
+}
+
+.wa-list-title {
+
+  color: #16a34a;
+
+  font-weight: 600;
+
+  margin-bottom: 10px;
+
+}
+
+.wa-list-body {
+
+  margin-bottom: 8px;
+
+}
+
+.wa-list-button {
+
+  color: #6b7280;
+
+  font-size: 14px;
+
+  margin-bottom: 8px;
+
+}
+
+.wa-list-limit {
+
+  font-size: 12px;
+
+  color: #9ca3af;
+
+  margin-bottom: 12px;
+
+}
+
+.wa-list-section {
+
+  border: 1px solid #e5e7eb;
+
+  border-radius: 12px;
+
+  padding: 10px;
+
+  margin-top: 10px;
+
+}
+
+.wa-list-section-title {
+
+  font-weight: 600;
+
+  margin-bottom: 8px;
+
+}
+
+.wa-list-chip {
+
+  display: inline-block;
+
+  padding: 6px 12px;
+
+  border-radius: 9999px;
+
+  background: #f3f4f6;
+
+  margin-right: 8px;
+
+  margin-bottom: 8px;
+
+}
+
+.api-card {
+
+  background: white;
+
+  border: 1px solid #ddd;
+
+  border-radius: 18px;
+
+  padding: 18px;
+
+  min-width: 280px;
+
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, .08);
+
+}
+
+.api-title {
+
+  color: #3b82f6;
+
+  font-weight: 600;
+
+  margin-bottom: 12px;
+
+}
+
+.api-method {
+
+  font-size: 14px;
+
+  margin-bottom: 8px;
+
+}
+
+.api-response {
+
+  color: #6b7280;
+
+  font-size: 13px;
+
+}
+
+.delay-card {
+
+  background: white;
+
+  border: 1px solid #ddd;
+
+  border-radius: 18px;
+
+  padding: 18px;
+
+  min-width: 240px;
+
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, .08);
+
+}
+
+.delay-title {
+
+  color: #ca8a04;
+
+  font-weight: 600;
+
+  margin-bottom: 12px;
+
+}
+
+.delay-value {
+
+  font-size: 15px;
+
+  margin-bottom: 8px;
+
+}
+
+.delay-info {
+
+  color: #6b7280;
+
+  font-size: 13px;
+
+}
+
+.end-session-card {
+  background: white;
+  border: 2px solid #f87171;
+  border-radius: 14px;
+  padding: 16px;
+  min-width: 250px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+.end-session-title {
+  color: #dc2626;
+  font-weight: 700;
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.end-session-description {
+  color: #4b5563;
+  font-size: 14px;
+  line-height: 1.5;
+}
