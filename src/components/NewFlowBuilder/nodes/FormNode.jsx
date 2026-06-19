@@ -5,9 +5,9 @@ function FormNode({ data }) {
         <div
             style={{
                 padding: "15px",
-                border: "2px solid #25D366",
+                border: "2px solid #059669",
                 borderRadius: "10px",
-                background: "white",
+                background: "#ecfdf5",
                 width: "250px",
             }}
         >

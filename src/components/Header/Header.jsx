@@ -262,8 +262,9 @@ const handleOpenNotification = () => {
     console.error('Invalid contact number');
     return;
   }
-    navigate(`/replyPage/${userId}`);
-    localStorage.setItem("ReplyedMobNo", contactNo);
+    navigate(
+    `/replyPage/${userId}/${contactNo}?dbType=${dbType}`
+  );
   };
 
   const splitChars = (str) => {
@@ -316,7 +317,7 @@ const handleOpenNotification = () => {
       <span className="header-page-title">{pageName}</span>
 
       {/* Recent Contacts Strip — only on Live Chats */}
-      {/* {pageName === "Live Chats" && recentContact.length > 0 && (
+      {pageName === "Live Chats" && recentContact.length > 0 && (
         <div className="header-recent-strip">
           {canScrollLeft && (
             <button className="header-scroll-btn" onClick={scrollLeft}>
@@ -345,7 +346,7 @@ const handleOpenNotification = () => {
             </button>
           )}
         </div>
-      )} */}
+      )}
 
       {/* Right: user badge + db switcher */}
       <div className="header-right">
@@ -371,7 +372,7 @@ const handleOpenNotification = () => {
             }}
           >
             <option value="demo">DigiLateral</option>
-            <option value="company">Client</option>
+            <option value="company">Aristo</option>
           </select>
 
           {isDbLoading && (

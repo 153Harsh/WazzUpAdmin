@@ -1,5 +1,5 @@
 import { Handle, Position } from "@xyflow/react";
-
+ 
 function WAMediaNode({ data }) {
     return (
         <div className="wa-media-card">
@@ -7,11 +7,11 @@ function WAMediaNode({ data }) {
                 type="target"
                 position={Position.Top}
             />
-
+ 
             <div className="wa-media-title">
                 🟠 WA Media
             </div>
-
+            
             <div className="wa-media-url">
                 {data.mediaType?.toUpperCase()}
                 {" → "}
@@ -21,11 +21,11 @@ function WAMediaNode({ data }) {
                         : data.mediaUrl
                 }
             </div>
-
+ 
             <div className="wa-media-support">
                 Supports image/video/document/audio/sticker
             </div>
-
+ 
             <Handle
                 type="source"
                 position={Position.Bottom}
@@ -33,5 +33,6 @@ function WAMediaNode({ data }) {
         </div>
     );
 }
-
+ 
 export default WAMediaNode;
+ 

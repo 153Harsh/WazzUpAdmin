@@ -4,9 +4,12 @@ import { Outlet } from 'react-router-dom';
 export default function GlobalLayout({ children }) {
  
   return (
-    <div className="h-[98dvh] bg-[#fff] font-sans">
-      <Sidebar/>
-      <main className="ml-[4dvw] w-[96dvw]"><Outlet /></main>
-    </div>
+    <div className="h-dvh flex bg-white font-sans overflow-hidden">
+  <Sidebar />
+
+  <main className="flex-1 overflow-hidden ml-[60px]">
+    <Outlet />
+  </main>
+</div>
   );
 }

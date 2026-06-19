@@ -4,13 +4,13 @@ export default function EndFlowNode() {
     return (
         <div
             style={{
-                padding: "10px 15px",
+                padding: "10px 10px",
                 border: "2px solid #843333",
                 borderRadius: "8px",
-                background: "#ffffff",
+                background: "#fdf2f2",
                 fontWeight: "bold",
                 textAlign: "center",
-                minWidth: "120px",
+                minWidth: "80px",
             }}
         >
             End Flow

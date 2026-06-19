@@ -1,48 +1,53 @@
 import { Handle, Position } from "@xyflow/react";
-
+ 
 function TextNode({ data }) {
     return (
         <div
             style={{
-                background: "white",
-                border: "1px solid #ddd",
-                borderRadius: "12px",
-                padding: "15px",
-                width: "250px",
+                background: "#fdf2f8",
+                border: "2px solid #ec4899",
+                borderRadius: "10px",
+                padding: "10px",
+                width: "200px",
             }}
         >
             <Handle
                 type="target"
                 position={Position.Top}
             />
-
+ 
             <div
                 style={{
-                    color: "#4a90e2",
-                    fontWeight: "bold",
-                    marginBottom: "10px",
+                    color: "#db2777",
+                    fontWeight: "600",
+                    fontSize: "13px",
+                    marginBottom: "8px",
                 }}
             >
-                ● Text Message
+                💬 Text Message
             </div>
-
-            <div>
-                {
-                    data.message ||
-                    "Your message..."
-                }
-            </div>
-
+            
             <div
                 style={{
-                    marginTop: "10px",
-                    color: "#777",
                     fontSize: "12px",
+                    color: "#9d174d",
+                    lineHeight: "1.4",
+                    wordBreak: "break-word",
+                }}
+            >
+                {data.message || "Your message..."}
+            </div>
+ 
+            <div
+                style={{
+                    marginTop: "6px",
+                    color: "#be185d",
+                    fontSize: "11px",
                 }}
             >
                 ≤ 4096 chars
             </div>
-
+ 
             <Handle
                 type="source"
                 position={Position.Bottom}
@@ -50,5 +55,6 @@ function TextNode({ data }) {
         </div>
     );
 }
-
+ 
 export default TextNode;
+ 

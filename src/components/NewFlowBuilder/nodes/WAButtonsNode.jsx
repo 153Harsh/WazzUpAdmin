@@ -1,114 +1,88 @@
 import { Handle, Position } from "@xyflow/react";
-
+ 
 function WAButtonsNode({ data }) {
     return (
         <div
             style={{
-                background: "white",
-                border: "1px solid #ddd",
-                borderRadius: "12px",
-                padding: "15px",
-                width: "280px",
+                background: "#f8fbff",
+                border: "2px solid #3b82f6",
+                borderRadius: "8px",
+                padding: "12px",
+                width: "200px",
             }}
         >
             <Handle
                 type="target"
                 position={Position.Top}
             />
-
+ 
             <div
                 style={{
-                    color: "#4a90e2",
-                    fontWeight: "bold",
+                    color: "#2563eb",
+                    fontWeight: "600",
+                    fontSize: "13px",
                     marginBottom: "10px",
                 }}
             >
-                ● WA Quick Replies (≤3)
+                🔵 WA Quick Replies
             </div>
-
+           
             <div
                 style={{
-                    marginBottom: "15px",
-                }}
-            >
-                {
-                    data.prompt ||
-                    "Prompt goes here"
-                }
-            </div>
-
-            {
-                (data.buttons || []).map(
-                    (
-                        button,
-                        index
-                    ) => (
-                        <div
-                            key={index}
-                            style={{
-                                padding: "8px",
-                                border: "1px solid #ddd",
-                                marginBottom: "8px",
-                                borderRadius: "8px",
-                            }}
-                        >
-                            {
-                                button ||
-                                "Button"
-                            }
-                        </div>
-                    )
-                )
-            }
-
-            <div
-                style={{
-                    marginTop: "10px",
-                    color: "#777",
+                    marginBottom: "12px",
                     fontSize: "12px",
+                    lineHeight: "1.4",
+                    wordBreak: "break-word",
+                    overflowWrap: "break-word",
+                    whiteSpace: "pre-wrap",
+                    maxWidth: "100%",
+                    color: "#333",
                 }}
             >
-                Each title ≤ 20 chars
+                {data.prompt || "Prompt goes here"}
             </div>
-
-            {
-                (
-                    data.buttons || []
-                ).map(
-
-                    (
-                        button,
-                        index
-                    ) => (
-
-                        <Handle
-
-                            key={index}
-
-                            type="source"
-
-                            id={`button-${index}`}
-
-                            position={Position.Right}
-
-                            style={{
-
-                                top:
-                                    120 +
-                                    index * 45,
-
-                                background:
-                                    "#555",
-                            }}
-
-                        />
-
-                    )
-
-                )
-            }
+ 
+            {(data.buttons || []).map((button, index) => (
+                <div
+                    key={index}
+                    style={{
+                        position: "relative",
+                        marginBottom: "8px",
+                        paddingRight: "18px",
+                    }}
+                >
+                    <div
+                        style={{
+                            padding: "6px",
+                            border: "1px solid #93c5fd",
+                            borderRadius: "6px",
+                            textAlign: "center",
+                            color: "#2563eb",
+                            fontWeight: "500",
+                            background: "#fff",
+                            fontSize: "12px",
+                        }}
+                    >
+                        {button || "Button"}
+                    </div>
+ 
+                    <Handle
+                        type="source"
+                        position={Position.Right}
+                        id={`button-${index}`}
+                        style={{
+                            top: "50%",
+                            background: "#3b82f6",
+                            width: "10px",
+                            height: "10px",
+                            border: "2px solid white",
+                        }}
+                    />
+                </div>
+            ))}
         </div>
     );
 }
-
+ 
 export default WAButtonsNode;
+ 

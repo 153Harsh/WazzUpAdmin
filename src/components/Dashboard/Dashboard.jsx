@@ -15,7 +15,7 @@ const Dashboard = () => {
 
   return (
     <>
-      <div className="grid grid-cols-2 absolute max-h-[110vh] ">
+      <div className="grid grid-cols-2 absolute max-h-[80vh] ">
         <Sidebar />
 
         <div

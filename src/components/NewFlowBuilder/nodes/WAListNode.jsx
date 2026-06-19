@@ -2,44 +2,44 @@ import {
     Handle,
     Position,
 } from "@xyflow/react";
-
+ 
 function WAListNode({ data }) {
     const sections = data.sections || [];
     let handleIndex = 0;
-
+ 
     return (
         <div className="wa-list-card">
             <Handle
                 type="target"
                 position={Position.Top}
             />
-
+ 
             <div className="wa-list-title">
                 🟢 WA List Message
             </div>
-
+           
             <div className="wa-list-body">
                 {data.body}
             </div>
-
+ 
             <div className="wa-list-button">
                 Button text: {data.buttonText}
             </div>
-
+ 
             <div className="wa-list-limit">
                 ≤ 10 rows per section
             </div>
-
+ 
             {sections.map((section, sectionIndex) => (
                 <div key={sectionIndex} className="wa-list-section">
                     <div className="wa-list-section-title">
                         {section.title}
                     </div>
-
+ 
                     <div className="wa-list-rows">
                         {(section.rows || []).map((row, rowIndex) => {
                             const currentHandle = handleIndex++;
-
+ 
                             return (
                                 <div
                                     key={rowIndex}
@@ -52,7 +52,7 @@ function WAListNode({ data }) {
                                     <span className="wa-list-chip">
                                         {row}
                                     </span>
-
+ 
                                     <Handle
                                         type="source"
                                         position={Position.Right}
@@ -60,8 +60,8 @@ function WAListNode({ data }) {
                                         style={{
                                             top: "50%",
                                             background: "#52c41a",
-                                            width: "10px",
-                                            height: "10px",
+                                            width: "8px",
+                                            height: "8px",
                                             border: "2px solid white",
                                             transform: "translateY(-50%)",
                                         }}
@@ -72,7 +72,7 @@ function WAListNode({ data }) {
                     </div>
                 </div>
             ))}
-
+ 
             <Handle
                 type="source"
                 position={Position.Bottom}
@@ -80,5 +80,6 @@ function WAListNode({ data }) {
         </div>
     );
 }
-
+ 
 export default WAListNode;
+ 

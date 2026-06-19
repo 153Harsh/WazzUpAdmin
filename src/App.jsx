@@ -43,7 +43,8 @@ const App = () => {
           <Route path="/whatsappOnBoarding/:id" element={<WhatsAppOnboarding />} />
           <Route path="/quizReports/:id" element={<QuizReports />} />
           <Route element={<GlobalLayout />} >
-            <Route path="/replyPage/:id" element={<ReplyPage />} />
+          <Route path="/replyPage/:id" element={<ReplyPage />} />
+<Route path="/replyPage/:id/:mobNo" element={<ReplyPage />} />
             <Route path="/contactList/:id" element={<ContactList />} />
             <Route path="/campaign/:id" element={<AllCampaign />} />
             <Route path="/singleCampaignDetail/:id" element={<CampaignDetails />} />

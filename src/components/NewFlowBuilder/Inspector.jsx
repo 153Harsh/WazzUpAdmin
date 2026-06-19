@@ -138,21 +138,21 @@ function Inspector({ selectedNode, setNodes, setSelectedNode }) {
             {/* WA Template Node */}
             {selectedNode?.type === "waTemplateNode" && (
                 <>
-                    <h3>WA TEMPLATE • {selectedNode.id}</h3>
+                    {/* <h3>WA TEMPLATE • {selectedNode.id}</h3> */}
 
-                    <label>Template Name</label>
-                    <input
+                    {/* <label>Template Name</label> */}
+                    {/* <input
                         value={selectedNode.data.templateName || ""}
                         onChange={(e) => updateNode("templateName", e.target.value)}
                         style={{ width: "100%", padding: "8px", marginTop: "5px", marginBottom: "10px" }}
-                    />
+                    /> */}
 
-                    <label>Language</label>
-                    <input
+                    {/* <label>Language</label> */}
+                    {/* <input
                         value={selectedNode.data.language || ""}
                         onChange={(e) => updateNode("language", e.target.value)}
                         style={{ width: "100%", padding: "8px", marginTop: "5px", marginBottom: "10px" }}
-                    />
+                    /> */}
 
                     <label>Header Type</label>
                     <select
@@ -193,7 +193,7 @@ function Inspector({ selectedNode, setNodes, setSelectedNode }) {
                         </>
                     )}
 
-                    <label>Body Variables (comma-separated)</label>
+                    {/* <label>Body Variables (comma-separated)</label>
                     <input
                         value={selectedNode.data.bodyVariables?.join(", ") || ""}
                         onChange={(e) =>
@@ -207,7 +207,25 @@ function Inspector({ selectedNode, setNodes, setSelectedNode }) {
                         }
                         placeholder="first_name, last_name"
                         style={{ width: "100%", padding: "8px", marginTop: "5px", marginBottom: "10px" }}
+                    /> */}
+
+                    <label>Template Body</label>
+ 
+                    <textarea
+                        value={selectedNode.data.bodyText || ""}
+                        onChange={(e) =>
+                            updateNode("bodyText", e.target.value)
+                        }
+                        placeholder="Enter WhatsApp template body..."
+                        style={{
+                            width: "100%",
+                            minHeight: "120px",
+                            padding: "8px",
+                            marginTop: "5px",
+                            marginBottom: "10px",
+                        }}
                     />
+ 
 
                     <br />
 
@@ -330,7 +348,7 @@ function Inspector({ selectedNode, setNodes, setSelectedNode }) {
             {/* WA List Node */}
             {selectedNode?.type === "waListNode" && (
                 <>
-                    <h3>WA LIST • {selectedNode.id}</h3>
+                    {/* <h3>WA LIST • {selectedNode.id}</h3> */}
 
                     <label>Body</label>
                     <textarea
@@ -479,7 +497,7 @@ function Inspector({ selectedNode, setNodes, setSelectedNode }) {
             {/* API Node - FIXED */}
             {selectedNode?.type === "apiNode" && (
                 <>
-                    <h3>API • {selectedNode.id}</h3>
+                    {/* <h3>API • {selectedNode.id}</h3> */}
 
                     <label>Method</label>
                     <select
@@ -636,7 +654,7 @@ function Inspector({ selectedNode, setNodes, setSelectedNode }) {
             {/* WA Media Node */}
             {selectedNode?.type === "waMediaNode" && (
                 <>
-                    <h3>WA MEDIA • {selectedNode.id}</h3>
+                    {/* <h3>WA MEDIA • {selectedNode.id}</h3> */}
 
                     <label>Media Type</label>
                     <select
@@ -715,7 +733,7 @@ function Inspector({ selectedNode, setNodes, setSelectedNode }) {
             )}
             {selectedNode?.type === "formNode" && (
                 <>
-                    <h3>Form Settings</h3>
+                    {/* <h3>Form Settings</h3> */}
 
                     <label>Form Title</label>
 
@@ -982,9 +1000,13 @@ function Inspector({ selectedNode, setNodes, setSelectedNode }) {
                                 <button
                                     style={{
                                         marginTop: "15px",
+                                        borderRadius:"20px",
+                                        paddingRight:"6px",
+                                        paddingLeft:"6px",
                                         background:
                                             "#ff4444",
                                         color: "white",
+                                        fontSize:"14px"
                                     }}
                                     onClick={() => {
                                         const updated =

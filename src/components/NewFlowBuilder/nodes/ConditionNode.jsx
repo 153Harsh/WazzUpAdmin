@@ -2,28 +2,28 @@ import {
     Handle,
     Position,
 } from "@xyflow/react";
-
+ 
 function ConditionNode({
     data,
 }) {
-
+ 
     return (
-
+ 
         <div
             style={{
-                background: "white",
-                border: "2px solid orange",
+                background: "#fff7ed",
+                border: "2px solid #f97316",
                 borderRadius: "12px",
-                padding: "15px",
-                width: "250px",
+                padding: "10px",
+                width: "160px",
             }}
         >
-
+ 
             <Handle
                 type="target"
                 position={Position.Top}
             />
-
+ 
             <div
                 style={{
                     fontWeight: "bold",
@@ -32,43 +32,43 @@ function ConditionNode({
             >
                 ◆ Condition
             </div>
-
+ 
             <div
                 style={{
-                    marginTop: "10px",
+                    marginTop: "8px",
                 }}
             >
-
+ 
                 {
-
+ 
                     data.variable ||
-
+ 
                     "variable"
-
+ 
                 }
-
+ 
                 {" "}
-
+ 
                 {
-
+ 
                     data.operator ||
-
+ 
                     "=="
-
+ 
                 }
-
+ 
                 {" "}
-
+ 
                 {
-
+ 
                     data.value ||
-
+ 
                     "value"
-
+ 
                 }
-
+ 
             </div>
-
+ 
             <Handle
                 type="source"
                 id="true"
@@ -77,7 +77,7 @@ function ConditionNode({
                     background: "green",
                 }}
             />
-
+ 
             <Handle
                 type="source"
                 id="false"
@@ -86,11 +86,12 @@ function ConditionNode({
                     background: "red",
                 }}
             />
-
+ 
         </div>
-
+ 
     );
-
+ 
 }
-
+ 
 export default ConditionNode;
+ 

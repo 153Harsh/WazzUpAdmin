@@ -29,7 +29,12 @@ const Sidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const socketRef = useRef(null);
-
+const normalizePhone = (phone = "") => String(phone || "").replace(/\D/g, "");
+    const isMatchingPhone = (a, b) => {
+      const normA = normalizePhone(a);
+      const normB = normalizePhone(b);
+      return normA && normB && normA === normB;
+    };
   const [menuItem, setMenuItem] = useState("");
  const userId = localStorage.getItem("UserId"); // ObjectId for API
 const adminIdDisplay = localStorage.getItem("AdminId"); 
@@ -73,7 +78,7 @@ useEffect(() => {
     try {
       const response = await apiGet(`/api/admin/allUsersNo/${userId}`, { page: 1, limit: 30 });
       const newData = response.data.data;
-      setMsgCountUnread(newData.filter((item) => item.adminReadLast === false).length);
+      setMsgCountUnread(newData.filter((item) => item?.adminReadLast === false).length);
       setQueryData(newData);
     } catch (error) {
       console.error("Failed to fetch data:", error);
@@ -92,12 +97,7 @@ useEffect(() => {
 
   useEffect(() => {
     if (!socketRef.current) return;
-    const normalizePhone = (phone = "") => String(phone || "").replace(/\D/g, "");
-    const isMatchingPhone = (a, b) => {
-      const normA = normalizePhone(a);
-      const normB = normalizePhone(b);
-      return normA && normB && normA === normB;
-    };
+    
 
     const handleUpdateMsg = (data) => {
       setQueryData((prev) => {
@@ -130,7 +130,15 @@ useEffect(() => {
     if (!socketRef.current) return;
     const handleUpdateRead = (data) => {
       setQueryData((prev) => {
-        const index = prev.findIndex((item) => item.From === data.From);
+        const index = prev.findIndex(
+  (item) =>
+    item &&
+    data &&
+    isMatchingPhone(
+      item?.From,
+      data?.From || data?.from
+    )
+);
         if (index !== -1) {
           const existing = prev[index];
           const msgChanged = JSON.stringify(existing.Messages) !== JSON.stringify(data.Messages);
