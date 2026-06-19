@@ -48,9 +48,9 @@ function Inspector({ selectedNode, setNodes, setSelectedNode }) {
 
             {selectedNode?.type === "startNode" && (
   <>
-            <label>Trigger Message</label>
+            {/* <label>Trigger Message</label> */}
 
-            <input
+            {/* <input
             type="text"
             placeholder="#test"
             value={selectedNode.data.trigger || ""}
@@ -63,7 +63,7 @@ function Inspector({ selectedNode, setNodes, setSelectedNode }) {
             marginTop: "5px",
             marginBottom: "10px"
             }}
-            />
+            /> */}
             </>
             )}
             {/* Text Msg */}

@@ -5,7 +5,9 @@ import Sidebar from "../NewFlowBuilder/Sidebar";
 import FlowCanvas from "../NewFlowBuilder/FlowCanvas";
 import Inspector from "../NewFlowBuilder/Inspector";
 import PreviewModal from "../NewFlowBuilder/preview/PreviewModal";
+// import FlowLibrarySidebarContainer from "./FlowLibrarySidebar";
 import { useParams } from "react-router-dom";
+
 
 const nodeTypeMap = {
   startNode: "start",
@@ -47,7 +49,7 @@ function NewFlowBuilder() {
   const [flowsList, setFlowsList] = useState([]);
   const [fitFunction, setFitFunction] = useState(null);
   const fileInputRef = useRef(null);
-
+const [flowName, setFlowName] = useState("");
   // Preview modal state
   const [previewOpen, setPreviewOpen] = useState(false);
 
@@ -224,6 +226,10 @@ function NewFlowBuilder() {
   // ---------- SAVE FLOW TO Mongo ----------
   const saveFlow = async () => {
     try {
+      if (!flowName.trim()) {
+      alert("Please enter flow name");
+      return;
+    }
       const cleanedNodes = nodes.map((node) => ({
         ...node,
         type: nodeTypeMap[node.type] || node.type,
@@ -255,10 +261,13 @@ console.log(
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            name: `Flow_${Date.now()}`,
-            nodes: cleanedNodes,
-            edges: cleanedEdges,
-          }),
+  name: flowName.trim(),
+  trigger: "",
+  description: "",
+  thumbnail: "",
+  nodes: cleanedNodes,
+  edges: cleanedEdges,
+}),
         }
       );
 
@@ -336,7 +345,9 @@ console.log(
         source: edge.source,
         sourceHandle: edge.sourceHandle ?? null,
         target: edge.target,
+        targetHandle: edge.targetHandle ?? null,
       }));
+
 
       const exportData = {
         version: "1.0",
@@ -375,6 +386,8 @@ console.log(
         const importedData = JSON.parse(e.target.result);
         const importedNodes = (importedData.nodes || []).map((node, index) => ({
           ...node,
+
+
           // IMPORTANT: preview runtime (NewFlowBuilder/preview) expects node.type like
           // startNode/textNode/waButtonsNode/... (not start/message/wa_buttons/...)
           type: reverseNodeTypeMap[node.type] || node.type,
@@ -383,16 +396,27 @@ console.log(
             y: 100 + Math.floor(index / 3) * 200,
           },
         }));
-        const importedEdges =
-          importedData.connections?.map((connection, index) => ({
-            id: `imported-edge-${index}`,
-            source: connection.source,
-            sourceHandle: connection.sourceHandle ?? null,
-            target: connection.target,
-          })) || [];
+        const sourceList =
+          importedData.connections ?? importedData.edges ?? [];
+
+        const importedEdges = (sourceList || []).map((connection, index) => ({
+          id: connection.id ?? `imported-edge-${index}`,
+          source: connection.source,
+          sourceHandle: connection.sourceHandle ?? null,
+          target: connection.target,
+          targetHandle: connection.targetHandle ?? null,
+        }));
+
+
 
         setNodes(importedNodes);
+
+        // Debug: see if edges are present but not rendering due to missing handle ids
+        console.log("Imported connections(raw):", importedData?.connections);
+        console.log("Imported edges(after map):", importedEdges);
+
         setEdges(importedEdges);
+
         alert("Meta JSON imported successfully!");
       } catch (error) {
         console.error(error);
@@ -434,6 +458,13 @@ console.log(
           style={{ display: "none" }}
           onChange={handleImportMetaJson}
         />
+         <input
+    type="text"
+    placeholder="Enter Flow Name"
+    value={flowName}
+    onChange={(e) => setFlowName(e.target.value)}
+    className="flow-name-input"
+  />
       </div>
 
       <div className="container">

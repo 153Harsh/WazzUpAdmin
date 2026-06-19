@@ -7,6 +7,7 @@ import { MdCampaign, MdLogout } from "react-icons/md";
 import { HiTemplate } from "react-icons/hi";
 import { LuContact } from "react-icons/lu";
 import { TiFlowMerge } from "react-icons/ti";
+import { MdLibraryBooks } from "react-icons/md";
 import { io } from "socket.io-client";
 import logo from "../../assets/Icon.png";
 import axios from "axios";
@@ -21,6 +22,7 @@ const NAV_ITEMS = [
   { key: "campaign", icon: MdCampaign, label: "Campaign" },
   { key: "fetchAllTemplates", icon: HiTemplate, label: "Templates" },
   { key: "flowBuilder", icon: TiFlowMerge, label: "Flow Builder" },
+  { key: "flowLibrary", icon: MdLibraryBooks, label: "Library" },
 ];
 
 const Sidebar = () => {
@@ -154,16 +156,26 @@ useEffect(() => {
     campaign: () => navigate(`/campaign/${userId}?dbType=${dbType}`),
     fetchAllTemplates: () => navigate(`/fetchAllTemplates/${userId}?dbType=${dbType}`),
     flowBuilder: () => navigate(`/new-flow-builder/${userId}?dbType=${dbType}`),
+    flowLibrary: () => navigate(`/flowLibrary/${userId}?dbType=${dbType}`),
   };
 
-  useEffect(() => {
-    const p = location.pathname;
-    const match = [
-      "reports", "contactList", "campaign", "fetchAllTemplates",
-      "flowBuilder", "dashboard", "user-reports", "message-status", "whatsappOnBoarding"
-    ].find((key) => p === `/${key === "reports" ? "replyPage" : key}/${userId}`);
-    if (match) setMenuItem(match);
-  }, [location.pathname, userId]);
+useEffect(() => {
+  const p = location.pathname;
+
+  if (p.includes("/replyPage/")) {
+    setMenuItem("reports");
+  } else if (p.includes("/contactList/")) {
+    setMenuItem("contactList");
+  } else if (p.includes("/campaign/")) {
+    setMenuItem("campaign");
+  } else if (p.includes("/fetchAllTemplates/")) {
+    setMenuItem("fetchAllTemplates");
+  } else if (p.includes("/new-flow-builder/")) {
+    setMenuItem("flowBuilder");
+  } else if (p.includes("/flowLibrary/")) {
+    setMenuItem("flowLibrary");
+  }
+}, [location.pathname]);
 
   const handleLogout = () => {
     localStorage.clear();

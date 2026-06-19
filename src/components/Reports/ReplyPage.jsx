@@ -62,7 +62,7 @@ const ReplyPage = () => {
 );
   const [loading, setLoading] = useState(false);
   const [dbSwitching, setDbSwitching] = useState(false);
-
+const [isMessagingDisabled, setIsMessagingDisabled] = useState(true); 
   const [queryData, setQueryData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -2293,20 +2293,22 @@ useEffect(() => {
                                 </div>
                               )}
                               <textarea
-                                value={messageValue}
-                                ref={textareaRef}
-                                onChange={handleGetMsg}
-                                onKeyDown={(e) => {
-                                  if (e.key === "Enter" && !e.shiftKey) {
-                                    e.preventDefault();
-                                    replyMessage ? handleSendReplyMessage() : handleSendMessage();
-                                  }
-                                }}
-                                placeholder={timer <= 0 ? "" : "Type a message…"}
-                                className="msg-textarea"
-                                disabled={timer <= 0}
-                                style={timer <= 0 ? { background: "#f3f4f6", cursor: "not-allowed" } : {}}
-                              />
+  value={messageValue}
+  ref={textareaRef}
+  onChange={handleGetMsg}
+  onKeyDown={(e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      if (!isMessagingDisabled) { // Add this condition
+        replyMessage ? handleSendReplyMessage() : handleSendMessage();
+      }
+    }
+  }}
+  placeholder={timer <= 0 ? "" : "Type a message…"}
+  className="msg-textarea"
+  disabled={timer <= 0 || isMessagingDisabled} // Add isMessagingDisabled here
+  style={timer <= 0 || isMessagingDisabled ? { background: "#f3f4f6", cursor: "not-allowed" } : {}}
+/>
                               {showPicker && (
                                 <div ref={pickerRef} className="absolute bottom-[5.2rem] left-0 z-10">
                                   <Picker onEmojiSelect={handleEmojiSelect} />
@@ -2364,11 +2366,15 @@ useEffect(() => {
                             )}
                           </div>
                           <div style={{ display: "flex", flexDirection: "column", gap: "6px", alignItems: "center", justifyContent: "flex-end", flexShrink: 0 }}>
-                            <button className="msg-send-btn" onClick={replyMessage ? handleSendReplyMessage : handleSendMessage} disabled={loadingSendMsg || !messageValue}>
-                              {!loadingSendMsg
-                                ? <IoSend size={16} color="white" />
-                                : <div style={{ width: "16px", height: "16px", border: "2px solid #fff", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.7s linear infinite" }} />}
-                            </button>
+                            <button 
+  className="msg-send-btn" 
+  onClick={replyMessage ? handleSendReplyMessage : handleSendMessage} 
+  disabled={loadingSendMsg || !messageValue || isMessagingDisabled} // Add isMessagingDisabled
+>
+  {!loadingSendMsg
+    ? <IoSend size={16} color="white" />
+    : <div style={{ width: "16px", height: "16px", border: "2px solid #fff", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.7s linear infinite" }} />}
+</button>
                             <button
                               className="msg-template-btn"
                               onClick={async () => {

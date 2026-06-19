@@ -302,8 +302,62 @@ useEffect(() => {
     // Optionally show a toast or handle error
   }
 }, [userId]);
+const replyReferenceId =
+  msg.replyId ||
+  msg.interactiveMsg?.id;
 
-  const repliedMessage = msg.replyId ? caseDetails.find((m) => m.id === msg.replyId) : null;
+const repliedMessage = replyReferenceId
+  ? caseDetails.find(
+      (m) =>
+        m.id === replyReferenceId ||
+        m.interactiveMsg?.id === replyReferenceId ||
+        m.statusId === replyReferenceId
+    )
+  : null;
+  
+  
+  
+if (msg.body?.includes("Request Demo")) {
+  console.log("replyReferenceId:", replyReferenceId);
+
+  const allMatches = caseDetails.filter(
+    (m) =>
+      m.id === replyReferenceId ||
+      m.interactiveMsg?.id === replyReferenceId ||
+      m.statusId === replyReferenceId
+  );
+
+  console.log("ALL MATCHES:", allMatches);
+}
+useEffect(() => {
+  console.log(
+  "ALL IDS:",
+  caseDetails.map((m) => ({
+    id: m.id,
+    statusId: m.statusId,
+    interactiveId: m.interactiveMsg?.id,
+    body: m.body,
+  }))
+);
+  const target =
+    "wamid.HBgMOTE3MDM5NzA5NTgwFQIAERgSQjlBQzY3NUQ4QzI4RjRDNEVGAA==";
+
+  const matches = caseDetails.filter(
+    (m) =>
+      m.id === target ||
+      m.interactiveMsg?.id === target
+  );
+
+  console.log("MATCHES:", matches);
+
+  const possibleMessages = caseDetails.filter(
+    (m) =>
+      m.body?.includes?.("Choose one") ||
+      m.interactiveMsg?.type
+  );
+
+  console.log("POSSIBLE INTERACTIVE MSGS:", possibleMessages);
+}, []);
   const interactiveRepliedMsg = msg?.interactiveMsg?.id ? caseDetails.find((m) => m.statusId === msg?.interactiveMsg?.id) : null;
   
   const body = msg.body;
@@ -700,6 +754,12 @@ const handleReplyMessage = useCallback(() => {
   };
 
   const renderContent = () => {
+    if (
+  typeof body === "string" &&
+  body.includes("Request Demo")
+) {
+  console.log("REQUEST DEMO MSG FULL:", JSON.stringify(msg, null, 2));
+}
     if (loadingTemplate) {
       return (
         <div style={{ width: 240, height: 100, background: "#f0f2f5", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: "#8696a0" }}>
@@ -807,7 +867,7 @@ const handleReplyMessage = useCallback(() => {
           </div>
         ) : media?.type === "video" ? (
           <div style={{ position: "relative", display: "inline-block" }}>
-            <video style={{ width: 240, height: 180, borderRadius: 8, display: "block", background: "#000" }}>
+            <video controls style={{ width: 240, height: 180, borderRadius: 8, display: "block", background: "#000" }}>
               <source src={media.url} type="video/mp4" />
             </video>
             <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.25)", borderRadius: 8 }}>
@@ -833,7 +893,9 @@ const handleReplyMessage = useCallback(() => {
     const replyText = Array.isArray(repliedMessage.body)
       ? repliedMessage.body.find((i) => !i.startsWith("image_")) || "Media"
       : !repliedMessage.body?.startsWith("image_") ? repliedMessage.body : "📷 Photo";
-
+console.log("CURRENT MESSAGE:", msg.id);
+console.log("replyId:", msg.replyId);
+console.log("repliedMessage:", repliedMessage);
     return (
       <div style={{
         background: isAdmin ? "rgba(0,0,0,0.06)" : "rgba(0,0,0,0.05)",
@@ -863,7 +925,7 @@ const handleReplyMessage = useCallback(() => {
       gap: 4,
     }}>
       <div style={{ maxWidth: "72%", display: "flex", flexDirection: "column", alignItems: isAdmin ? "flex-end" : "flex-start" }}>
-        {renderReplyPreview()}
+        
         
         <div style={{
           background: bubbleBg,
@@ -877,6 +939,14 @@ const handleReplyMessage = useCallback(() => {
           maxWidth: 280,
         }}>
           <Tail isAdmin={isAdmin} color={bubbleBg} />
+         {console.log(
+  "CHECK:",
+  msg.replyId,
+  !!repliedMessage,
+  renderReplyPreview()
+)}
+
+{msg.replyId && repliedMessage && renderReplyPreview()}
           {renderContent()}
           {renderMediaPreviews()}
         </div>

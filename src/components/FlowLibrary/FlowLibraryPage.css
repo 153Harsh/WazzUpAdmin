@@ -1,0 +1,831 @@
+/* FlowLibraryPage.css */
+
+/* ===== ROOT VARIABLES ===== */
+:root {
+  --primary: #6366f1;
+  --primary-dark: #4f46e5;
+  --primary-light: #818cf8;
+  --primary-gradient: linear-gradient(135deg, #08b157 0%, #007e3b 100%);
+  --secondary: #0f172a;
+  --gray-50: #f8fafc;
+  --gray-100: #f1f5f9;
+  --gray-200: #e2e8f0;
+  --gray-300: #cbd5e1;
+  --gray-400: #94a3b8;
+  --gray-500: #64748b;
+  --gray-600: #475569;
+  --gray-700: #334155;
+  --gray-800: #1e293b;
+  --gray-900: #0f172a;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ===== MAIN CONTAINER ===== */
+.flow-library-page {
+  width: 100%;
+  height: 100%;
+  
+  /* Ensure no unexpected outer spacing coming from this container */
+  margin-left: 30px;
+  padding: 0;
+  background: #f8fafc;
+}
+
+.flow-library-card-btn-download {
+  background: #f59e0b;
+  color: white;
+}
+
+.flow-library-card-btn-download:hover {
+  background: #d97706;
+}
+/* ===== HEADER ===== */
+.flow-library-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  background: white;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--gray-200);
+  margin-bottom: 20px;
+}
+
+.flow-library-page-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--gray-900);
+  letter-spacing: -0.3px;
+}
+
+.flow-library-page-title span {
+  background: var(--primary-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.flow-library-page-sub {
+  margin-top: 2px;
+  font-size: 13px;
+  color: var(--gray-500);
+  font-weight: 500;
+}
+
+/* ===== STATS BAR ===== */
+.flow-library-stats {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 12px 20px;
+  background: white;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 20px;
+  border: 1px solid var(--gray-200);
+}
+
+.flow-library-stat-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--gray-600);
+}
+
+.flow-library-stat-item .stat-number {
+  font-weight: 700;
+  color: var(--gray-900);
+  font-size: 16px;
+}
+
+.flow-library-stat-item .stat-label {
+  color: var(--gray-500);
+  font-size: 13px;
+}
+
+.flow-library-stat-divider {
+  width: 1px;
+  height: 24px;
+  background: var(--gray-200);
+}
+
+/* ===== BODY ===== */
+.flow-library-page-body {
+  padding: 0;
+}
+
+/* ===== LOADING ===== */
+.flow-library-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 40px 0;
+  color: var(--gray-500);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.flow-library-loading::before {
+  content: '';
+  width: 20px;
+  height: 20px;
+  border: 2.5px solid var(--gray-200);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ===== EMPTY STATE ===== */
+.flow-library-page-empty {
+  text-align: center;
+  padding: 60px 20px;
+  background: white;
+  border-radius: var(--radius-lg);
+  border: 2px dashed var(--gray-200);
+}
+
+.flow-library-page-empty .empty-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+  display: block;
+}
+
+.flow-library-page-empty .empty-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--gray-900);
+  margin-bottom: 6px;
+}
+
+.flow-library-page-empty .empty-sub {
+  font-size: 14px;
+  color: var(--gray-500);
+}
+
+/* ===== GRID ===== */
+.flow-library-page-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+/* ===== CARD ===== */
+.flow-library-card {
+  background: white;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--gray-200);
+  transition: var(--transition);
+  position: relative;
+}
+
+.flow-library-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--primary-light);
+}
+
+.flow-library-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2.5px;
+  background: var(--primary-gradient);
+  opacity: 0;
+  transition: var(--transition);
+}
+
+.flow-library-card:hover::before {
+  opacity: 1;
+}
+
+/* ===== THUMBNAIL ===== */
+.flow-thumbnail-wrapper {
+  position: relative;
+  width: 100%;
+  padding-top: 45%; /* Shorter aspect ratio for compact cards */
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flow-thumbnail {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: var(--transition);
+}
+
+.flow-library-card:hover .flow-thumbnail {
+  transform: scale(1.03);
+}
+
+/* ===== WATERMARK ===== */
+.flow-thumbnail-watermark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 42px;
+  font-weight: 900;
+  letter-spacing: -2px;
+  color: var(--gray-300);
+  opacity: 0.4;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
+  pointer-events: none;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  white-space: nowrap;
+}
+
+.flow-thumbnail-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(8px);
+  color: white;
+  padding: 3px 10px;
+  border-radius: 16px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  text-transform: uppercase;
+}
+
+/* ===== CARD CONTENT ===== */
+.flow-library-card-content {
+  padding: 12px 16px 14px;
+}
+
+.flow-library-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.flow-library-card-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--gray-900);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.flow-library-card-status {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 14px;
+  font-size: 10px;
+  font-weight: 600;
+  flex-shrink: 0;
+  margin-left: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.flow-library-card-status.active {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.flow-library-card-status.inactive {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.flow-library-card-status .status-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.flow-library-card-description {
+  font-size: 12px;
+  color: var(--gray-500);
+  margin-bottom: 10px;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.4;
+  min-height: 17px;
+}
+
+.flow-library-card-description.empty {
+  color: var(--gray-400);
+  font-style: italic;
+}
+
+.flow-library-card-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-top: 1px solid var(--gray-100);
+  border-bottom: 1px solid var(--gray-100);
+  margin-bottom: 12px;
+}
+
+.flow-library-card-trigger {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--gray-600);
+}
+
+.flow-library-card-trigger .trigger-label {
+  font-weight: 500;
+  color: var(--gray-400);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.flow-library-card-trigger .trigger-value {
+  font-weight: 600;
+  color: var(--gray-800);
+  background: var(--gray-100);
+  padding: 1px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.flow-library-card-trigger .trigger-value.not-set {
+  color: var(--gray-400);
+  background: transparent;
+  font-weight: 400;
+}
+
+.flow-library-card-date {
+  font-size: 11px;
+  color: var(--gray-400);
+  white-space: nowrap;
+}
+
+/* ===== CARD ACTIONS ===== */
+.flow-library-card-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.flow-library-card-btn {
+  flex: 1;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  border: none;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.flow-library-card-btn-primary {
+  background: var(--primary-gradient);
+  color: white;
+  box-shadow: 0 2px 6px rgba(99, 102, 241, 0.25);
+}
+
+.flow-library-card-btn-primary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(99, 102, 241, 0.35);
+}
+
+.flow-library-card-btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.flow-library-card-btn-secondary {
+  background: var(--gray-100);
+  color: var(--gray-700);
+}
+
+.flow-library-card-btn-secondary:hover {
+  background: var(--gray-200);
+  transform: translateY(-1px);
+}
+
+/* ===== SETTINGS MODAL ===== */
+.settings-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.settings-content {
+  background: white;
+  border-radius: var(--radius-lg);
+  padding: 28px 32px;
+  max-width: 500px;
+  width: 90%;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-2xl);
+  animation: slideUp 0.25s ease;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.settings-content h2 {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.settings-content input,
+.settings-content textarea {
+  width: 100%;
+  padding: 10px 14px;
+  border: 2px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  transition: var(--transition);
+  font-family: inherit;
+  margin-bottom: 14px;
+  background: var(--gray-50);
+}
+
+.settings-content input:focus,
+.settings-content textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  background: white;
+}
+
+.settings-content textarea {
+  min-height: 70px;
+  resize: vertical;
+}
+
+/* ===== THUMBNAIL UPLOAD ===== */
+.thumbnail-upload-section {
+  margin-bottom: 20px;
+}
+
+.thumbnail-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gray-700);
+  margin-bottom: 8px;
+}
+
+.thumbnail-input-group {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.thumbnail-url-input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 2px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  transition: var(--transition);
+  background: var(--gray-50);
+}
+
+.thumbnail-url-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  background: white;
+}
+
+.thumbnail-upload-btn-wrapper {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.upload-btn {
+  padding: 8px 18px;
+  background: var(--primary-gradient);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  box-shadow: 0 2px 6px rgba(99, 102, 241, 0.25);
+  white-space: nowrap;
+}
+
+.upload-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(99, 102, 241, 0.35);
+}
+
+.upload-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.hidden-file-input {
+  display: none;
+}
+
+.thumbnail-preview-container {
+  margin-top: 4px;
+}
+
+.thumbnail-preview-wrapper {
+  position: relative;
+  display: inline-block;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.thumbnail-preview {
+  max-width: 160px;
+  max-height: 160px;
+  border-radius: var(--radius-sm);
+  display: block;
+  object-fit: cover;
+}
+
+.remove-thumbnail-btn {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #ef4444;
+  color: white;
+  border: 2px solid white;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+  box-shadow: var(--shadow-sm);
+}
+
+.remove-thumbnail-btn:hover {
+  background: #dc2626;
+  transform: scale(1.1);
+}
+
+.thumbnail-placeholder {
+  padding: 24px 16px;
+  text-align: center;
+  color: var(--gray-400);
+  background: var(--gray-50);
+  border: 2px dashed var(--gray-300);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* ===== SETTINGS ACTIONS ===== */
+.settings-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--gray-200);
+}
+
+.settings-actions button {
+  flex: 1;
+  padding: 10px 18px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  border: none;
+}
+
+.settings-actions button:first-child {
+  background: var(--gray-100);
+  color: var(--gray-700);
+}
+
+.settings-actions button:first-child:hover {
+  background: var(--gray-200);
+}
+
+.settings-actions button:last-child {
+  background: var(--primary-gradient);
+  color: white;
+  box-shadow: 0 2px 6px rgba(99, 102, 241, 0.25);
+}
+
+.settings-actions button:last-child:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(99, 102, 241, 0.35);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1024px) {
+  .flow-library-page-grid {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .flow-library-page {
+    padding: 12px 16px;
+  }
+
+  .flow-library-page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 14px 18px;
+  }
+
+  .flow-library-page-title {
+    font-size: 20px;
+  }
+
+  .flow-library-stats {
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 10px 16px;
+  }
+
+  .flow-library-stat-divider {
+    display: none;
+  }
+
+  .flow-library-page-grid {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+  }
+
+  .flow-thumbnail-watermark {
+    font-size: 32px;
+  }
+
+  .settings-content {
+    padding: 20px;
+    max-width: 100%;
+    width: 95%;
+    margin: 12px;
+  }
+
+  .thumbnail-input-group {
+    flex-direction: column;
+  }
+
+  .upload-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .settings-actions {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 480px) {
+  .flow-library-page-title {
+    font-size: 18px;
+  }
+
+  .flow-library-page-sub {
+    font-size: 12px;
+  }
+
+  .flow-library-page-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .flow-thumbnail-watermark {
+    font-size: 28px;
+  }
+
+  .flow-library-card-content {
+    padding: 10px 14px 12px;
+  }
+
+  .flow-library-card-meta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .flow-library-card-actions {
+    flex-direction: column;
+  }
+
+  .flow-library-card-btn {
+    padding: 8px;
+  }
+
+  .thumbnail-preview {
+    max-width: 120px;
+    max-height: 120px;
+  }
+}
+
+/* ===== SCROLLBAR ===== */
+.flow-library-page::-webkit-scrollbar {
+  width: 5px;
+}
+
+.flow-library-page::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.flow-library-page::-webkit-scrollbar-thumb {
+  background: var(--gray-300);
+  border-radius: 20px;
+}
+
+.flow-library-page::-webkit-scrollbar-thumb:hover {
+  background: var(--gray-400);
+}
+
+.settings-content::-webkit-scrollbar {
+  width: 5px;
+}
+
+.settings-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.settings-content::-webkit-scrollbar-thumb {
+  background: var(--gray-300);
+  border-radius: 20px;
+}

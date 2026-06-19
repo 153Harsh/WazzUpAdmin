@@ -18,6 +18,7 @@ import FlowBuilder from "./components/FlowBuilder/flowBuilder";
 import QuizReports from "./components/QuizReports";
 import GlobalLayout from "./Layouts/GlobalLayout";
 import NewFlowBuilder from "./components/FlowBuilder/NewFlowBuilder";
+import FlowLibraryPage from "./components/FlowLibrary/FlowLibraryPage";
 
 
 const App = () => {
@@ -49,10 +50,11 @@ const App = () => {
             <Route path="/fetchAllTemplates/:id" element={<SubmittedTemplates />} />
             <Route path="/createTemplate/:id" element={<CreateTemp />} />
             <Route path="/flowBuilder/:id" element={<FlowBuilder />} />
-           <Route
-  path="/new-flow-builder/:id"
-  element={<NewFlowBuilder />}
-/>
+            <Route path="/flowLibrary/:id" element={<FlowLibraryPage />} />
+            <Route
+              path="/new-flow-builder/:id"
+              element={<NewFlowBuilder />}
+            />
           </Route>
         </Routes>
       </BrowserRouter>

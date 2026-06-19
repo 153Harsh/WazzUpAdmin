@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 
-function PreviewModal({ isOpen, onClose, nodes, edges }) {
+function PreviewModal({ isOpen, onClose, nodes, edges,trigger, }) {
     const [messages, setMessages] = useState([]);
     const [currentNode, setCurrentNode] = useState(null);
     const [variables, setVariables] = useState({});
@@ -445,13 +445,9 @@ useEffect(() => {
         const userText = inputValue.trim();
 
     // START FLOW IF NOT RUNNING
-    if (!currentNode) {
+if (!currentNode) {
 
-    const startNode = nodes.find(
-        n => n.type === "startNode"
-    );
-
-    const trigger = startNode?.data?.trigger?.trim();
+    const flowTrigger = trigger?.trim();
 
     setMessages(prev => [
         ...prev,
@@ -459,9 +455,18 @@ useEffect(() => {
     ]);
 
     if (
-        trigger &&
-        userText.toLowerCase() === trigger.toLowerCase()
+        flowTrigger &&
+        userText.toLowerCase() === flowTrigger.toLowerCase()
     ) {
+
+        const startNode = nodes.find(
+            n => n.type === "startNode"
+        );
+
+        if (!startNode) {
+            console.error("Start node not found");
+            return;
+        }
 
         const startEdge = edges.find(
             e => e.source === startNode.id
@@ -477,7 +482,7 @@ useEffect(() => {
             ...prev,
             {
                 type: "bot",
-                text: `Please send ${trigger}`
+                text: `Please send ${flowTrigger}`
             }
         ]);
     }
