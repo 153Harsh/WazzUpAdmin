@@ -214,11 +214,15 @@ const MessageItem = React.memo(({
   const [selectedImage, setSelectedImage] = useState(null);
   const [templateData, setTemplateData] = useState(null);
   const [loadingTemplate, setLoadingTemplate] = useState(false);
+
+  const [replyTemplateData, setReplyTemplateData] = useState(null);
+  const [loadingReplyTemplate, setLoadingReplyTemplate] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [contentLoaded, setContentLoaded] = useState(false);
   const [showListOptions, setShowListOptions] = useState(false);
   const [loggedId, setLoggedId] = useState(null);
     const messagesEndRef = useRef(null);
+    
   const getMessageText = (messageBody, fullMsg = null) => {
     if (!messageBody) return '[Empty]';
     
@@ -302,20 +306,16 @@ useEffect(() => {
     // Optionally show a toast or handle error
   }
 }, [userId]);
-const replyReferenceId =
-  msg.replyId ||
-  msg.interactiveMsg?.id;
+  const replyReferenceId =
+    msg.replyId || msg.interactiveMsg?.id;
 
-const repliedMessage = replyReferenceId
-  ? caseDetails.find(
-      (m) =>
-        m.id === replyReferenceId ||
-        m.interactiveMsg?.id === replyReferenceId ||
-        m.statusId === replyReferenceId
-    )
-  : null;
+  const repliedMessage = msg.interactiveMsg?.id
+    ? caseDetails.find((m) => m.statusId === msg.interactiveMsg.id)
+    : replyReferenceId
+      ? caseDetails.find((m) => m.id === replyReferenceId)
+      : null;
   
-  
+
   
 if (msg.body?.includes("Request Demo")) {
   console.log("replyReferenceId:", replyReferenceId);
@@ -379,7 +379,22 @@ useEffect(() => {
     if (m) return m[1].trim();
     return null;
   };
+const scrollToMessage = (messageId) => {
+  const element = document.getElementById(`message-${messageId}`);
 
+  if (element) {
+    element.scrollIntoView({
+      behavior: "smooth",
+      block: "center",
+    });
+
+    element.classList.add("message-highlight");
+
+    setTimeout(() => {
+      element.classList.remove("message-highlight");
+    }, 2000);
+  }
+};
   const cleanButtonText = getCleanButtonText(body);
   const isButtonReplyMessage = cleanButtonText !== null;
 
@@ -467,7 +482,98 @@ const handlePreviewImage = useCallback(async (imageKey) => {
       return () => clearTimeout(t);
     }
   }, [isLastMessage, contentLoaded, templateData, scrollToBottom]);
-const handleReplyMessage = useCallback(() => {
+  const fetchReplyTemplate = useCallback(async () => {
+    
+    if (!userId || !isValidObjectId(userId)) return;
+    if (!repliedMessage?.body || typeof repliedMessage.body !== 'string') return;
+
+    const templateName = repliedMessage.body;
+
+    if (!templateName) return;
+
+    setLoadingReplyTemplate(true);
+    setReplyTemplateData(null);
+    try {
+     const res = await axios.get(
+  `http://localhost:7821/api/admin/getTemplateData/${userId}/${templateName}`,
+  {
+    params: { dbType: getDbType() },
+  }
+);
+
+console.log("REPLY TEMPLATE RESPONSE", res.data);
+
+setReplyTemplateData(res.data.data);
+    } catch (e) {
+      console.error('Reply template load error:', e);
+    } finally {
+      setLoadingReplyTemplate(false);
+    }
+  }, [repliedMessage, userId]);
+
+  useEffect(() => {
+    if (repliedMessage?.body && typeof repliedMessage.body === 'string' && repliedMessage.body.endsWith('_temp')) {
+      console.log(
+  "FETCHING REPLY TEMPLATE",
+  repliedMessage
+);
+      fetchReplyTemplate();
+    }
+  }, [repliedMessage, fetchReplyTemplate]);
+
+  const renderInteractiveReplyPreview = () => {
+    if (!repliedMessage) return null;
+
+   const bodyComponent = replyTemplateData?.components?.find(
+  (c) => c.type === "BODY"
+);
+
+const previewText = (
+  bodyComponent?.text ||
+  repliedMessage?.body ||
+  ""
+)
+  .replace(/\*/g, "") // remove bold markers
+  .replace(/_/g, " ") // remove italic markers
+  .replace(/\{\{\d+\}\}/g, "") // remove template variables
+  .replace(/\s+/g, " ")
+  .trim();
+
+    const headerComponent = replyTemplateData?.components?.find((c) => c.type === 'HEADER');
+    const hasImage = headerComponent?.format === 'IMAGE';
+
+    return (
+      <div
+      onClick={() => scrollToMessage(repliedMessage.id)}
+        style={{
+          background: 'rgba(0,0,0,0.08)',
+          borderLeft: `4px solid ${'#a855f7'}`,
+          borderRadius: 6,
+          padding: '6px 10px',
+          marginBottom: 4,
+          maxWidth: 260,
+        }}
+      >
+        <div style={{ fontSize: 12, fontWeight: 600, color: '#7c3aed', marginBottom: 2 }}>
+          digiLATERAL
+        </div>
+        <div
+          style={{
+            fontSize: 12,
+            color: '#555',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {hasImage && '📷 '}
+          {previewText}
+        </div>
+      </div>
+    );
+  };
+
+  const handleReplyMessage = useCallback(() => {
   if (userId && !isValidObjectId(userId)) {
     console.error('Invalid userId for reply');
     return;
@@ -927,7 +1033,11 @@ console.log("repliedMessage:", repliedMessage);
       <div style={{ maxWidth: "72%", display: "flex", flexDirection: "column", alignItems: isAdmin ? "flex-end" : "flex-start" }}>
         
         
-        <div style={{
+        <div
+          id={`message-${msg.id}`}
+ 
+        style={{
+          
           background: bubbleBg,
           borderRadius: isAdmin
             ? (msg.replyId || interactiveRepliedMsg ? "12px 2px 12px 12px" : "12px 2px 12px 12px")
@@ -939,14 +1049,12 @@ console.log("repliedMessage:", repliedMessage);
           maxWidth: 280,
         }}>
           <Tail isAdmin={isAdmin} color={bubbleBg} />
-         {console.log(
-  "CHECK:",
-  msg.replyId,
-  !!repliedMessage,
-  renderReplyPreview()
-)}
+          {msg.replyId && repliedMessage && renderReplyPreview()}
 
-{msg.replyId && repliedMessage && renderReplyPreview()}
+{!msg.replyId &&
+ msg.interactiveMsg?.id &&
+ repliedMessage &&
+ renderInteractiveReplyPreview()}
           {renderContent()}
           {renderMediaPreviews()}
         </div>

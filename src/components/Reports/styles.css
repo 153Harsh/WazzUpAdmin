@@ -237,7 +237,18 @@
   padding: 0 5px;
   flex-shrink: 0;
 }
+.message-highlight {
+  animation: highlightMessage 2s ease;
+}
 
+@keyframes highlightMessage {
+  0% {
+    background: #fff3b0;
+  }
+  100% {
+    background: inherit;
+  }
+}
 /* === Chat Header === */
 .chat-header {
   background: #fff;
