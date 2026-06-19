@@ -439,17 +439,17 @@ console.log(
       <div className="header">Flow Builder</div>
 
       <div className="toolbar">
-        <button onClick={saveFlow}>Save</button>
+        <button onClick={saveFlow}>SAVE</button>
         {/* <button onClick={() => {
           const flowId = prompt("Enter Flow ID to load:");
           if (flowId) loadFlowById(flowId);
         }}>Load</button> */}
-        <button onClick={() => setPreviewOpen(true)}>Preview</button>
-        <button onClick={handleExportMetaJson}>Export Meta JSON</button>
+        <button onClick={() => setPreviewOpen(true)}>PREVIEW</button>
+        <button onClick={handleExportMetaJson}>EXPORT META JSON</button>
         <button onClick={() => fileInputRef.current.click()}>
-          Import Meta JSON
+          IMPORT META JSON
         </button>
-        <button onClick={() => fitFunction?.()}>Fit</button>
+        <button onClick={() => fitFunction?.()}>FIT</button>
 
         <input
           type="file"

@@ -17,7 +17,7 @@ const blocks = [
 function Sidebar({ addNode, onDragStart }) {
     return (
         <div className="sidebar">
-            <h4>Blocks</h4>
+            <h4 className="font-medium text-black">BLOCKS</h4>
             <div className="sidebar-grid">
                 {blocks.map((block) => (
                     <div
@@ -31,6 +31,7 @@ function Sidebar({ addNode, onDragStart }) {
                     </div>
                 ))}
             </div>
+            <div class="mt-3 text-[13px] text-gray-500">Drag a block onto the canvas</div>
         </div>
     );
 }

@@ -5,7 +5,7 @@ body {
 }
 
 .header {
-  height: 50px;
+  height: 40px;
   background: #dff0d8;
   border-bottom: 1px solid #c5dec0;
   display: flex;
@@ -26,11 +26,12 @@ body {
 
 .toolbar button {
   padding: 6px 14px;
-  border: 1px solid #dcdcdc;
+  border: 2px solid #cfcfcf;
   border-radius: 4px;
   background: white;
   cursor: pointer;
   font-size: 13px;
+  font-weight: 500;
 }
 
 .toolbar button:hover {
@@ -45,10 +46,11 @@ body {
 
 .flow-name-input {
   width: 250px;
-  padding: 8px 12px;
-  border: 1px solid #ccc;
+  padding: 4px 8px;
+  border: 2px solid #ccc;
   border-radius: 6px;
   margin: 0 20px;
+  font-weight: 500;
 }
 
 /* Sidebar */
