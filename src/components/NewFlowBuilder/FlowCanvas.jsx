@@ -26,6 +26,7 @@ import DelayNode from "./nodes/DelayNode";
 import FormNode from "./nodes/FormNode";
 import EndFlowNode from "./nodes/EndFlowNode";
 import EndSessionNode from "./nodes/EndSessionNode";
+import FlowTransferNode from "./nodes/FlowTransferNode";
 
 const nodeTypes = {
     startNode: StartNode,
@@ -41,6 +42,7 @@ const nodeTypes = {
     delayNode: DelayNode,
     endSessionNode: EndSessionNode,
     formNode: FormNode,
+    flowTransferNode: FlowTransferNode,
 };
 
 function FlowCanvasInner({
@@ -51,6 +53,9 @@ function FlowCanvasInner({
     setSelectedNode,
     addNode,
     setFitFunction,
+    onNodeDragStop,
+    disconnectNode,
+ 
 }) {
     const { screenToFlowPosition, fitView } =
         useReactFlow();
@@ -66,12 +71,96 @@ function FlowCanvasInner({
         }
     }, [fitView, setFitFunction]);
 
-    const onNodesChange = (changes) => {
-        setNodes((nds) =>
-            applyNodeChanges(changes, nds)
-        );
+    const getConnectedNodes = (
+        nodeId,
+        edges,
+        visited = new Set()
+    ) => {
+        visited.add(nodeId);
+ 
+        edges.forEach((edge) => {
+            if (!edge.data?.auto) return;
+ 
+            if (
+                edge.source === nodeId &&
+                !visited.has(edge.target)
+            ) {
+                getConnectedNodes(
+                    edge.target,
+                    edges,
+                    visited
+                );
+            }
+ 
+            if (
+                edge.target === nodeId &&
+                !visited.has(edge.source)
+            ) {
+                getConnectedNodes(
+                    edge.source,
+                    edges,
+                    visited
+                );
+            }
+        });
+ 
+        return visited;
     };
-
+ 
+    // ---------- onNodesChange – moves entire connected chain together ----------
+    const onNodesChange = (changes) => {
+        setNodes((nds) => {
+            // First apply the position changes to the dragged node
+            let updatedNodes = applyNodeChanges(changes, nds);
+ 
+            // Now process each position change that is a drag
+            changes.forEach((change) => {
+                if (
+                    change.type !== "position" ||
+                    !change.dragging
+                ) {
+                    return;
+                }
+ 
+                // Find the node that was dragged (using the original state before changes)
+                const movedNode = nds.find(
+                    n => n.id === change.id
+                );
+                if (!movedNode) return;
+ 
+                // Get all nodes connected via auto edges (including the moved node)
+                const connectedIds = getConnectedNodes(
+                    movedNode.id,
+                    edges
+                );
+ 
+                // Calculate the delta (how much the node moved)
+                const deltaX = change.position.x - movedNode.position.x;
+                const deltaY = change.position.y - movedNode.position.y;
+ 
+                // Move every connected node by the same delta,
+                // except the dragged node itself (already updated by applyNodeChanges)
+                updatedNodes = updatedNodes.map((node) => {
+                    if (node.id === movedNode.id) {
+                        return node; // keep the already updated position
+                    }
+                    if (connectedIds.has(node.id)) {
+                        return {
+                            ...node,
+                            position: {
+                                x: node.position.x + deltaX,
+                                y: node.position.y + deltaY,
+                            },
+                        };
+                    }
+                    return node;
+                });
+            });
+ 
+            return updatedNodes;
+        });
+    };
+ 
     const onEdgesChange = (changes) => {
         setEdges((eds) =>
             applyEdgeChanges(changes, eds)
@@ -100,15 +189,13 @@ function FlowCanvasInner({
 
         addNode(type, position);
     };
-
     const onDragOver = (event) => {
         event.preventDefault();
 
         event.dataTransfer.dropEffect =
             "move";
     };
-
-    return (
+return (
         <div
             className="canvas"
             style={{
@@ -117,30 +204,35 @@ function FlowCanvasInner({
             }}
         >
             <ReactFlow
-                nodes={nodes}
-                edges={edges}
+                nodes={nodes.map(node => ({
+                    ...node,
+                    data: {
+                        ...node.data,
+                        disconnectNode,
+                        nodeId: node.id,
+                    }
+                }))}
+                edges={edges.filter(
+                    edge => !edge.hidden
+                )}
                 nodeTypes={nodeTypes}
                 onNodesChange={onNodesChange}
                 onEdgesChange={onEdgesChange}
                 onConnect={onConnect}
                 onDrop={onDrop}
+                onNodeDragStop={onNodeDragStop}
                 onDragOver={onDragOver}
-                onNodeClick={(
-                    event,
-                    node
-                ) => {
+                onNodeClick={(event, node) => {
                     setSelectedNode(node);
                 }}
                 fitView
             >
                 <Background />
-
                 <Controls />
             </ReactFlow>
         </div>
     );
 }
-
 function FlowCanvas(props) {
     return (
         <ReactFlowProvider>
@@ -150,5 +242,4 @@ function FlowCanvas(props) {
         </ReactFlowProvider>
     );
 }
-
 export default FlowCanvas;

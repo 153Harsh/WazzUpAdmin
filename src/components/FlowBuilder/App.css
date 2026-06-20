@@ -25,7 +25,7 @@ body {
 }
 
 .toolbar button {
-  padding: 6px 14px;
+  padding: 2px 14px;
   border: 2px solid #cfcfcf;
   border-radius: 4px;
   background: white;
@@ -46,7 +46,7 @@ body {
 
 .flow-name-input {
   width: 250px;
-  padding: 4px 8px;
+  padding: 1px 8px;
   border: 2px solid #ccc;
   border-radius: 6px;
   margin: 0 20px;
@@ -736,4 +736,25 @@ body {
  
   cursor: pointer;
 }
+.sidebar-tips {
+  margin-top: 4px;
+}
  
+.sidebar-tips h4 {
+  font-size: 13px;
+  font-weight: 400;
+  color: #1f2937;
+  margin-bottom: 10px;
+}
+ 
+.sidebar-tips ul {
+  margin: 0;
+  padding-left: 18px;
+}
+ 
+.sidebar-tips li {
+  font-size: 12px;
+  color: #4b5563;
+  line-height: 1.7;
+  margin-bottom: 8px;
+}

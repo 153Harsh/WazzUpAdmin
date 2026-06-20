@@ -1,4 +1,10 @@
-import React, { useEffect, useMemo, useState, useRef } from "react";
+import React, {
+  useEffect,
+  useMemo,
+  useState,
+  useRef,
+  useCallback,
+} from "react";
 import { useParams } from "react-router-dom";
 
 import PreviewModal from "../NewFlowBuilder/preview/PreviewModal";
@@ -20,104 +26,219 @@ export default function FlowLibraryPage() {
   const [description, setDescription] = useState("");
   const [thumbnail, setThumbnail] = useState("");
   const [uploadingThumbnail, setUploadingThumbnail] = useState(false);
+  const [viewMode, setViewMode] = useState("cards");
+  const [deletingFlowId, setDeletingFlowId] = useState(null);
+
   const fileInputRef = useRef(null);
 
-  const openSettings = (flow) => {
+  // Helper to get flow ID consistently
+  const getFlowId = useCallback((flow) => flow?._id || flow?.id, []);
+
+  // Helper to find flow by ID
+  const findFlowById = useCallback(
+    (id) => {
+      return flows.find((f) => (f._id || f.id) === id) || null;
+    },
+    [flows],
+  );
+
+  const openSettings = useCallback((flow) => {
     setEditingFlow(flow);
     setTrigger(flow.trigger || "");
     setDescription(flow.description || "");
     setThumbnail(flow.thumbnail || "");
     setShowSettings(true);
-  };
-const downloadFlowJson = async (flowId, flowName) => {
-  try {
-    const response = await fetch(
-      `http://localhost:7821/api/admin/flow/${flowId}`
-    );
+  }, []);
 
-    const result = await response.json();
-
-    if (!result.success) {
-      alert("Failed to download flow");
-      return;
-    }
-
-    const dataStr = JSON.stringify(result.data, null, 2);
-
-    const blob = new Blob([dataStr], {
-      type: "application/json",
-    });
-
-    const url = window.URL.createObjectURL(blob);
-
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `${flowName || "flow"}.json`;
-
-    document.body.appendChild(link);
-    link.click();
-
-    document.body.removeChild(link);
-    window.URL.revokeObjectURL(url);
-  } catch (error) {
-    console.error(error);
-    alert("Failed to download flow");
-  }
-};
-  const handleFileUpload = async (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    if (!file.type.startsWith('image/')) {
-      alert('Please upload an image file');
-      return;
-    }
-
-    if (file.size > 5 * 1024 * 1024) {
-      alert('File size must be less than 5MB');
-      return;
-    }
-
-    setUploadingThumbnail(true);
-
+  const downloadFlowJson = useCallback(async (flowId, flowName) => {
     try {
-      const formData = new FormData();
-      formData.append('thumbnail', file);
-
       const response = await fetch(
-        `http://localhost:7821/api/admin/flow/${editingFlow._id}/upload-thumbnail?dbType=demo`,
-        {
-          method: 'POST',
-          body: formData,
-        }
+        `http://localhost:7821/api/admin/flow/${flowId}`,
       );
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Server error response:', errorText);
-        throw new Error(`Server responded with ${response.status}: ${errorText}`);
+      const result = await response.json();
+
+      if (!result.success) {
+        alert("Failed to download flow");
+        return;
       }
+
+      const dataStr = JSON.stringify(result.data, null, 2);
+
+      const blob = new Blob([dataStr], {
+        type: "application/json",
+      });
+
+      const url = window.URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `${flowName || "flow"}.json`;
+
+      document.body.appendChild(link);
+      link.click();
+
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error(error);
+      alert("Failed to download flow");
+    }
+  }, []);
+
+  const deleteFlow = useCallback(async (flowId, flowName) => {
+    if (
+      !window.confirm(
+        `Are you sure you want to delete "${flowName || "Untitled Flow"}"?`,
+      )
+    ) {
+      return;
+    }
+
+    setDeletingFlowId(flowId);
+
+    try {
+      const response = await fetch(
+        `http://localhost:7821/api/admin/admin/flow/${flowId}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
 
       const result = await response.json();
 
       if (result.success) {
-        setThumbnail(result.data.thumbnail);
-        alert('Thumbnail uploaded successfully!');
+        setFlows((prev) => prev.filter((f) => (f._id || f.id) !== flowId));
+        alert("Flow deleted successfully!");
       } else {
-        alert('Failed to upload thumbnail: ' + (result.message || 'Unknown error'));
+        alert("Failed to delete flow: " + (result.message || "Unknown error"));
       }
     } catch (error) {
-      console.error('Error uploading thumbnail:', error);
-      alert('Error uploading thumbnail: ' + error.message);
+      console.error("Error deleting flow:", error);
+      alert("Error deleting flow: " + error.message);
     } finally {
-      setUploadingThumbnail(false);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
+      setDeletingFlowId(null);
     }
-  };
+  }, []);
 
-  const saveSettings = async () => {
+  const handleFileUpload = useCallback(
+    async (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      if (!file.type.startsWith("image/")) {
+        alert("Please upload an image file");
+        return;
+      }
+
+      if (file.size > 5 * 1024 * 1024) {
+        alert("File size must be less than 5MB");
+        return;
+      }
+
+      setUploadingThumbnail(true);
+
+      try {
+        const formData = new FormData();
+        formData.append("thumbnail", file);
+
+        const response = await fetch(
+          `http://localhost:7821/api/admin/flow/${editingFlow._id}/upload-thumbnail?dbType=demo`,
+          {
+            method: "POST",
+            body: formData,
+          },
+        );
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error("Server error response:", errorText);
+          throw new Error(
+            `Server responded with ${response.status}: ${errorText}`,
+          );
+        }
+
+        const result = await response.json();
+
+        if (result.success) {
+          setThumbnail(result.data.thumbnail);
+          alert("Thumbnail uploaded successfully!");
+        } else {
+          alert(
+            "Failed to upload thumbnail: " +
+              (result.message || "Unknown error"),
+          );
+        }
+      } catch (error) {
+        console.error("Error uploading thumbnail:", error);
+        alert("Error uploading thumbnail: " + error.message);
+      } finally {
+        setUploadingThumbnail(false);
+        if (fileInputRef.current) {
+          fileInputRef.current.value = "";
+        }
+      }
+    },
+    [editingFlow],
+  );
+const flowsWithConnections = useMemo(() => {
+  return flows.map(flow => {
+    const targetIds =
+      flow.nodes
+        ?.filter(
+          node =>
+            node.type === "flow_transfer" ||
+            node.type === "flowTransferNode"
+        )
+        .map(node => node?.data?.targetFlowId)
+        .filter(Boolean) || [];
+
+    const connectedNames = targetIds.map(id => {
+      const target = flows.find(
+        f => String(f._id || f.id) === String(id)
+      );
+
+      return target?.name;
+    }).filter(Boolean);
+
+    return {
+      ...flow,
+      connectedNames,
+    };
+  });
+}, [flows]);
+  const transferFlowById = useCallback(async (flowId) => {
+    try {
+      const response = await fetch(
+        `http://localhost:7821/api/admin/flow/${flowId}`,
+      );
+
+      const result = await response.json();
+
+      if (!result.success) {
+        console.error("Failed to transfer flow:", result);
+        return;
+      }
+
+      const convertedNodes = (result.data.nodes || []).map((node) => ({
+        ...node,
+        type: normalizeNodeType(node.type),
+      }));
+
+      setSelectedFlow(result.data);
+      setNodes(convertedNodes);
+      setEdges(result.data.edges || []);
+    } catch (e) {
+      console.error("Error transferring flow:", e);
+    }
+  }, []);
+
+  const saveSettings = useCallback(async () => {
+    if (!editingFlow) return;
+
     try {
       const response = await fetch(
         `http://localhost:7821/api/admin/flow/${editingFlow._id}/settings`,
@@ -131,7 +252,7 @@ const downloadFlowJson = async (flowId, flowName) => {
             description,
             thumbnail,
           }),
-        }
+        },
       );
 
       const result = await response.json();
@@ -140,11 +261,7 @@ const downloadFlowJson = async (flowId, flowName) => {
         alert("Flow updated");
 
         setFlows((prev) =>
-          prev.map((f) =>
-            f._id === editingFlow._id
-              ? result.data
-              : f
-          )
+          prev.map((f) => (f._id === editingFlow._id ? result.data : f)),
         );
 
         setShowSettings(false);
@@ -153,14 +270,16 @@ const downloadFlowJson = async (flowId, flowName) => {
       console.error(error);
       alert("Failed to save settings");
     }
-  };
+  }, [editingFlow, trigger, description, thumbnail]);
 
+  // Load flows on userId change
   useEffect(() => {
     if (!userId) return;
-    const run = async () => {
+
+    const loadFlows = async () => {
       try {
         const response = await fetch(
-          `http://localhost:7821/api/admin/flows/${userId}`
+          `http://localhost:7821/api/admin/flows/${userId}`,
         );
         const result = await response.json();
         if (result?.success) setFlows(result.data || []);
@@ -168,15 +287,19 @@ const downloadFlowJson = async (flowId, flowName) => {
         console.error("Failed to load flows", e);
       }
     };
-    run();
+
+    loadFlows();
   }, [userId]);
+
+  // Update connected flows whenever flows change
 
   const selectedFlowMemo = useMemo(() => {
     if (!selectedFlowId) return null;
-    return flows.find((f) => (f._id || f.id) === selectedFlowId) || null;
-  }, [flows, selectedFlowId]);
+    return findFlowById(selectedFlowId);
+  }, [selectedFlowId, findFlowById]);
 
-  const normalizeNodeType = (rawType) => {
+  // Normalize node type - moved outside component to prevent recreation
+  const normalizeNodeType = useCallback((rawType) => {
     if (!rawType || typeof rawType !== "string") return rawType;
 
     const t = rawType.trim();
@@ -184,67 +307,72 @@ const downloadFlowJson = async (flowId, flowName) => {
 
     const aliases = {
       start: "startNode",
-      "startnode": "startNode",
-      "start_node": "startNode",
+      startnode: "startNode",
+      start_node: "startNode",
       "start-node": "startNode",
 
       message: "textNode",
-      "messagenode": "textNode",
-      "text": "textNode",
-      "textnode": "textNode",
-      "text_msg": "textNode",
+      messagenode: "textNode",
+      text: "textNode",
+      textnode: "textNode",
+      text_msg: "textNode",
       "text-message": "textNode",
 
       wa_buttons: "waButtonsNode",
-      "wa_buttonsnode": "waButtonsNode",
-      "wabuttons": "waButtonsNode",
-      "wabuttonsnode": "waButtonsNode",
+      wa_buttonsnode: "waButtonsNode",
+      wabuttons: "waButtonsNode",
+      wabuttonsnode: "waButtonsNode",
       "wa-buttons": "waButtonsNode",
 
       wa_list: "waListNode",
-      "wa_listnode": "waListNode",
-      "walist": "waListNode",
-      "walistnode": "waListNode",
+      wa_listnode: "waListNode",
+      walist: "waListNode",
+      walistnode: "waListNode",
       "wa-list": "waListNode",
 
       wa_media: "waMediaNode",
-      "wa_medianode": "waMediaNode",
-      "wamedianode": "waMediaNode",
+      wa_medianode: "waMediaNode",
+      wamedianode: "waMediaNode",
       "wa-media": "waMediaNode",
 
       wa_template: "waTemplateNode",
-      "wa_templatenode": "waTemplateNode",
-      "watemplate": "waTemplateNode",
-      "watemplatenode": "waTemplateNode",
+      wa_templatenode: "waTemplateNode",
+      watemplate: "waTemplateNode",
+      watemplatenode: "waTemplateNode",
       "wa-template": "waTemplateNode",
 
       input: "inputNode",
-      "inputnode": "inputNode",
-      "freeinput": "inputNode",
+      inputnode: "inputNode",
+      freeinput: "inputNode",
       "input-node": "inputNode",
 
       condition: "conditionNode",
-      "conditionnode": "conditionNode",
-      "if": "conditionNode",
+      conditionnode: "conditionNode",
+      if: "conditionNode",
 
       api: "apiNode",
-      "apinode": "apiNode",
+      apinode: "apiNode",
 
       delay: "delayNode",
-      "delaynode": "delayNode",
+      delaynode: "delayNode",
 
       form: "formNode",
-      "formnode": "formNode",
+      formnode: "formNode",
 
       end: "endFlowNode",
-      "endflow": "endFlowNode",
-      "endflownode": "endFlowNode",
+      endflow: "endFlowNode",
+      endflownode: "endFlowNode",
       "end-flow": "endFlowNode",
 
       end_session: "endSessionNode",
-      "endsession": "endSessionNode",
-      "endsessionnode": "endSessionNode",
+      endsession: "endSessionNode",
+      endsessionnode: "endSessionNode",
       "end-session": "endSessionNode",
+
+      flow_transfer: "flowTransferNode",
+      flowtransfer: "flowTransferNode",
+      flow_transfernode: "flowTransferNode",
+      "flow-transfer": "flowTransferNode",
     };
 
     if (aliases.hasOwnProperty(lc)) return aliases[lc];
@@ -253,51 +381,282 @@ const downloadFlowJson = async (flowId, flowName) => {
     if (aliases.hasOwnProperty(normalized)) return aliases[normalized];
 
     return rawType;
-  };
+  }, []);
 
-  const loadFlowIntoPreview = async (flowId) => {
-    setLoading(true);
-    setSelectedFlowId(flowId);
+  const loadFlowById = useCallback(
+    async (flowId) => {
+      setLoading(true);
+      setSelectedFlowId(flowId);
 
-    try {
-      const response = await fetch(`http://localhost:7821/api/admin/flow/${flowId}`);
-      const result = await response.json();
+      try {
+        const response = await fetch(
+          `http://localhost:7821/api/admin/flow/${flowId}`,
+        );
+        const result = await response.json();
 
-      if (!result?.success) {
-        console.error("Failed to load flow:", result);
+        if (!result?.success) {
+          console.error("Failed to load flow:", result);
+          setLoading(false);
+          return;
+        }
+
+        const convertedNodes = (result.data.nodes || []).map((node) => ({
+          ...node,
+          type: normalizeNodeType(node.type),
+        }));
+
+        setSelectedFlow(result.data);
+        setNodes(convertedNodes);
+        setEdges(result.data.edges || []);
+        setPreviewOpen(true);
+      } catch (e) {
+        console.error("Failed to load flow", e);
+      } finally {
         setLoading(false);
-        return;
       }
+    },
+    [normalizeNodeType],
+  );
 
-      const convertedNodes = (result.data.nodes || []).map((node) => ({
-        ...node,
-        type: normalizeNodeType(node.type),
-      }));
-
-      setSelectedFlow(result.data);
-      setNodes(convertedNodes);
-      setEdges(result.data.edges || []);
-      setPreviewOpen(true);
-    } catch (e) {
-      console.error("Failed to load flow", e);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleModalClose = () => {
+  const handleModalClose = useCallback(() => {
     setPreviewOpen(false);
-  };
+    setSelectedFlow(null);
+    setNodes([]);
+    setEdges([]);
+  }, []);
 
-  const formatDate = (dateString) => {
-    if (!dateString) return '';
+  const formatDate = useCallback((dateString) => {
+    if (!dateString) return "";
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      month: 'short', 
-      day: 'numeric', 
-      year: 'numeric' 
+    return date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
     });
-  };
+  }, []);
+
+  // Render functions
+  const renderFlowCard = useCallback(
+    (flow) => {
+      const id = flow._id || flow.id;
+      const isDeleting = deletingFlowId === id;
+      const connectedFlows = flow.connectedNames || [];
+      return (
+        <div key={id} className="flow-library-card">
+          <div className="flow-thumbnail-wrapper">
+            {flow.thumbnail ? (
+              <img
+                src={flow.thumbnail}
+                alt={flow.name}
+                className="flow-thumbnail"
+              />
+            ) : (
+              <div className="flow-thumbnail-watermark">#WAZZUP</div>
+            )}
+            <div className="flow-thumbnail-badge">
+              {flow.trigger ? "● Active" : "○ Inactive"}
+            </div>
+            
+          </div>
+
+          <div className="flow-library-card-content">
+            <div className="flow-library-card-header">
+              <div className="flow-library-card-name">
+                {flow.name || "Untitled Flow"}
+              </div>
+              <div
+                className={`flow-library-card-status ${flow.trigger ? "active" : "inactive"}`}
+              >
+                <span className="status-dot" />
+                {flow.trigger ? "Active" : "Inactive"}
+              </div>
+            </div>
+
+            <div
+              className={`flow-library-card-description ${!flow.description ? "empty" : ""}`}
+            >
+              {flow.description || "No description available"}
+            </div>
+            {connectedFlows.length > 0 && (
+  <div className="flow-connected-section">
+    <div className="flow-connected-list">
+      {connectedFlows.map((name, index) => (
+        <span
+          key={index}
+          className="flow-connected-badge"
+        >
+          🔗 {name}
+        </span>
+      ))}
+    </div>
+  </div>
+)}
+            <div className="flow-library-card-meta">
+              <div className="flow-library-card-trigger">
+                <span className="trigger-label">Trigger:</span>
+                <span
+                  className={`trigger-value ${!flow.trigger ? "not-set" : ""}`}
+                >
+                  {flow.trigger || "Not Set"}
+                </span>
+              </div>
+              <div className="flow-library-card-date">
+                {formatDate(flow.updatedAt || flow.createdAt)}
+              </div>
+            </div>
+
+            <div className="flow-library-card-actions">
+              <button
+                className="flow-library-card-btn flow-library-card-btn-secondary"
+                onClick={() => openSettings(flow)}
+              >
+                Edit
+              </button>
+
+              <button
+                className="flow-library-card-btn flow-library-card-btn-primary"
+                onClick={() => loadFlowById(id)}
+                disabled={loading}
+              >
+                {loading && selectedFlowId === id ? "Loading..." : "Preview"}
+              </button>
+              <button
+                className="flow-library-card-btn flow-library-card-btn-download"
+                onClick={() => downloadFlowJson(id, flow.name)}
+              >
+                Download
+              </button>
+              <button
+              className="flow-library-card-btn flow-library-card-btn-delete"
+              onClick={() => deleteFlow(id, flow.name)}
+              disabled={isDeleting}
+            >
+              {isDeleting ? "Deleting..." : "Delete"}
+            </button> 
+            </div>
+          </div>
+        </div>
+      );
+    },
+    [
+      deletingFlowId,
+      loading,
+      selectedFlowId,
+      deleteFlow,
+      openSettings,
+      loadFlowById,
+      downloadFlowJson,
+      formatDate,
+    ],
+  );
+
+  const renderFlowListItem = useCallback(
+    (flow) => {
+      const id = flow._id || flow.id;
+      const isDeleting = deletingFlowId === id;
+      const connectedFlows = flow.connectedNames || [];
+      return (
+        <div key={id} className="flow-library-list-item">
+          <div className="flow-list-thumbnail">
+            {flow.thumbnail ? (
+              <img
+                src={flow.thumbnail}
+                alt={flow.name}
+                className="flow-list-thumbnail-img"
+              />
+            ) : (
+              <div className="flow-list-thumbnail-placeholder">#</div>
+            )}
+          </div>
+
+          <div className="flow-list-content">
+            <div className="flow-list-header">
+              <div className="flow-list-name">
+                {flow.name || "Untitled Flow"}
+              </div>
+              <div
+                className={`flow-library-card-status ${flow.trigger ? "active" : "inactive"}`}
+              >
+                <span className="status-dot" />
+                {flow.trigger ? "Active" : "Inactive"}
+              </div>
+            </div>
+
+            <div
+              className={`flow-list-description ${!flow.description ? "empty" : ""}`}
+            >
+              {flow.description || "No description available"}
+            </div>
+{connectedFlows.length > 0 && (
+  <div className="flow-connected-list">
+    {connectedFlows.map((name, index) => (
+      <span
+        key={index}
+        className="flow-connected-badge"
+      >
+        🔗 {name}
+      </span>
+    ))}
+  </div>
+)}
+            <div className="flow-list-meta">
+              <div className="flow-list-trigger">
+                <span className="trigger-label">Trigger:</span>
+                <span
+                  className={`trigger-value ${!flow.trigger ? "not-set" : ""}`}
+                >
+                  {flow.trigger || "Not Set"}
+                </span>
+              </div>
+              <div className="flow-list-date">
+                {formatDate(flow.updatedAt || flow.createdAt)}
+              </div>
+            </div>
+          </div>
+
+          <div className="flow-list-actions">
+            <button
+              className="flow-library-card-btn flow-library-card-btn-secondary"
+              onClick={() => openSettings(flow)}
+            >
+              Edit
+            </button>
+
+            <button
+              className="flow-library-card-btn flow-library-card-btn-primary"
+              onClick={() => loadFlowById(id)}
+              disabled={loading}
+            >
+              {loading && selectedFlowId === id ? "Loading..." : "Preview"}
+            </button>
+            <button
+              className="flow-library-card-btn flow-library-card-btn-download"
+              onClick={() => downloadFlowJson(id, flow.name)}
+            >
+              Download
+            </button>
+            <button
+              className="flow-library-card-btn flow-library-card-btn-delete"
+              onClick={() => deleteFlow(id, flow.name)}
+              disabled={isDeleting}
+            >
+              {isDeleting ? "Deleting..." : "Delete"}
+            </button>
+          </div>
+        </div>
+      );
+    },
+    [
+      deletingFlowId,
+      loading,
+      selectedFlowId,
+      deleteFlow,
+      openSettings,
+      loadFlowById,
+      downloadFlowJson,
+      formatDate,
+    ],
+  );
 
   return (
     <div className="flow-library-page">
@@ -306,7 +665,9 @@ const downloadFlowJson = async (flowId, flowName) => {
           <div className="flow-library-page-title">
             📚 <span>Flow Library</span>
           </div>
-          <div className="flow-library-page-sub">Manage and preview your saved flows</div>
+          <div className="flow-library-page-sub">
+            Manage and preview your saved flows
+          </div>
         </div>
       </div>
 
@@ -318,107 +679,55 @@ const downloadFlowJson = async (flowId, flowName) => {
         <div className="flow-library-stat-divider" />
         <div className="flow-library-stat-item">
           <span className="stat-number">
-            {flows.filter(f => f.trigger).length}
+            {flows.filter((f) => f.trigger).length}
           </span>
           <span className="stat-label">With Triggers</span>
         </div>
         <div className="flow-library-stat-divider" />
         <div className="flow-library-stat-item">
           <span className="stat-number">
-            {flows.filter(f => f.thumbnail).length}
+            {flows.filter((f) => f.thumbnail).length}
           </span>
           <span className="stat-label">With Thumbnails</span>
+        </div>
+        <div className="flow-library-view-toggle">
+          <button
+            className={`view-toggle-btn ${viewMode === "cards" ? "active" : ""}`}
+            onClick={() => setViewMode("cards")}
+          >
+            <span className="view-icon">📇</span>
+            Cards
+          </button>
+          <button
+            className={`view-toggle-btn ${viewMode === "list" ? "active" : ""}`}
+            onClick={() => setViewMode("list")}
+          >
+            <span className="view-icon">📋</span>
+            List
+          </button>
         </div>
       </div>
 
       <div className="flow-library-page-body">
         {loading && <div className="flow-library-loading">Loading flow...</div>}
-        
+
         {!loading && flows.length === 0 ? (
           <div className="flow-library-page-empty">
             <span className="empty-icon">📭</span>
             <div className="empty-title">No flows found</div>
-            <div className="empty-sub">Create your first flow to get started</div>
+            <div className="empty-sub">
+              Create your first flow to get started
+            </div>
           </div>
         ) : (
-          <div className="flow-library-page-grid">
-            {flows.map((flow) => {
-              const id = flow._id || flow.id;
-
-              return (
-                <div key={id} className="flow-library-card">
-                  <div className="flow-thumbnail-wrapper">
-                    {flow.thumbnail ? (
-                      <img
-                        src={flow.thumbnail}
-                        alt={flow.name}
-                        className="flow-thumbnail"
-                      />
-                    ) : (
-                      <div className="flow-thumbnail-watermark">#WAZZUP</div>
-                    )}
-                    <div className="flow-thumbnail-badge">
-                      {flow.trigger ? '● Active' : '○ Inactive'}
-                    </div>
-                  </div>
-
-                  <div className="flow-library-card-content">
-                    <div className="flow-library-card-header">
-                      <div className="flow-library-card-name">
-                        {flow.name || "Untitled Flow"}
-                      </div>
-                      <div className={`flow-library-card-status ${flow.trigger ? 'active' : 'inactive'}`}>
-                        <span className="status-dot" />
-                        {flow.trigger ? 'Active' : 'Inactive'}
-                      </div>
-                    </div>
-
-                    <div className={`flow-library-card-description ${!flow.description ? 'empty' : ''}`}>
-                      {flow.description || "No description available"}
-                    </div>
-
-                    <div className="flow-library-card-meta">
-                      <div className="flow-library-card-trigger">
-                        <span className="trigger-label">Trigger:</span>
-                        <span className={`trigger-value ${!flow.trigger ? 'not-set' : ''}`}>
-                          {flow.trigger || "Not Set"}
-                        </span>
-                      </div>
-                      <div className="flow-library-card-date">
-                        {formatDate(flow.updatedAt || flow.createdAt)}
-                      </div>
-                    </div>
-
-                    <div className="flow-library-card-actions">
-                      <button
-                        className="flow-library-card-btn flow-library-card-btn-secondary"
-                        onClick={() => openSettings(flow)}
-                      >
-                        Edit
-                      </button>
-
-                      <button
-                        className="flow-library-card-btn flow-library-card-btn-primary"
-                        onClick={() => loadFlowIntoPreview(id)}
-                        disabled={loading}
-                      >
-                        {loading && selectedFlowId === id ? (
-                          'Loading...'
-                        ) : (
-                          'Preview'
-                        )}
-                      </button>
-                      <button
-  className="flow-library-card-btn flow-library-card-btn-download"
-  onClick={() => downloadFlowJson(id, flow.name)}
->
-  Download
-</button>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
+          <div
+            className={`flow-library-container ${viewMode === "list" ? "list-view" : "grid-view"}`}
+          >
+           {flowsWithConnections.map((flow) =>
+  viewMode === "cards"
+    ? renderFlowCard(flow)
+    : renderFlowListItem(flow)
+)}
           </div>
         )}
       </div>
@@ -428,8 +737,8 @@ const downloadFlowJson = async (flowId, flowName) => {
         onClose={handleModalClose}
         nodes={nodes}
         edges={edges}
-        flowId={selectedFlow?._id || selectedFlowMemo?._id}
         trigger={selectedFlow?.trigger || ""}
+        loadFlowById={transferFlowById}
       />
 
       {showSettings && (
@@ -451,7 +760,7 @@ const downloadFlowJson = async (flowId, flowName) => {
 
             <div className="thumbnail-upload-section">
               <label className="thumbnail-label">Thumbnail Image</label>
-              
+
               <div className="thumbnail-input-group">
                 <input
                   type="text"
@@ -460,14 +769,14 @@ const downloadFlowJson = async (flowId, flowName) => {
                   onChange={(e) => setThumbnail(e.target.value)}
                   className="thumbnail-url-input"
                 />
-                
+
                 <div className="thumbnail-upload-btn-wrapper">
-                  <button 
+                  <button
                     className="upload-btn"
                     onClick={() => fileInputRef.current?.click()}
                     disabled={uploadingThumbnail}
                   >
-                    {uploadingThumbnail ? '⏳ Uploading...' : '📤 Upload'}
+                    {uploadingThumbnail ? "⏳ Uploading..." : "📤 Upload"}
                   </button>
                   <input
                     type="file"
@@ -490,7 +799,7 @@ const downloadFlowJson = async (flowId, flowName) => {
                     />
                     <button
                       className="remove-thumbnail-btn"
-                      onClick={() => setThumbnail('')}
+                      onClick={() => setThumbnail("")}
                       title="Remove thumbnail"
                     >
                       ×
@@ -505,13 +814,9 @@ const downloadFlowJson = async (flowId, flowName) => {
             </div>
 
             <div className="settings-actions">
-              <button onClick={() => setShowSettings(false)}>
-                Cancel
-              </button>
+              <button onClick={() => setShowSettings(false)}>Cancel</button>
 
-              <button onClick={saveSettings}>
-                💾 Save Changes
-              </button>
+              <button onClick={saveSettings}>💾 Save Changes</button>
             </div>
           </div>
         </div>

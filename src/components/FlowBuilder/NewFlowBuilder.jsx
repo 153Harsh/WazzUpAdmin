@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
+import { applyNodeChanges } from "reactflow"; x 
 import "./App.css";
-
 import Sidebar from "../NewFlowBuilder/Sidebar";
 import FlowCanvas from "../NewFlowBuilder/FlowCanvas";
 import Inspector from "../NewFlowBuilder/Inspector";
@@ -23,6 +23,7 @@ const nodeTypeMap = {
   formNode: "form",
   endFlowNode: "end",
   endSessionNode: "end_session",
+  flowTransferNode: "flow_transfer",
 };
 
 const reverseNodeTypeMap = {
@@ -39,12 +40,16 @@ const reverseNodeTypeMap = {
   form: "formNode",
   end: "endFlowNode",
   end_session: "endSessionNode",
+  flow_transfer: "flowTransferNode",
 };
 
 function NewFlowBuilder() {
+  const [isRestored, setIsRestored] = useState(false);
   const { id: userId } = useParams();
   const [nodes, setNodes] = useState([]);
   const [edges, setEdges] = useState([]);
+  const [previewNodes, setPreviewNodes] = useState([]);
+const [previewEdges, setPreviewEdges] = useState([]);
   const [selectedNode, setSelectedNode] = useState(null);
   const [flowsList, setFlowsList] = useState([]);
   const [fitFunction, setFitFunction] = useState(null);
@@ -52,6 +57,243 @@ function NewFlowBuilder() {
 const [flowName, setFlowName] = useState("");
   // Preview modal state
   const [previewOpen, setPreviewOpen] = useState(false);
+const AUTO_TYPES = [
+    "textNode",
+    "waButtonsNode",
+    "waListNode",
+    "waMediaNode",
+    "waTemplateNode",
+    "inputNode",
+  ];
+ 
+  const CONNECT_DISTANCE = 200;
+ 
+  const getBottomPoint = (node) => ({
+    x: node.position.x + 120,
+    y: node.position.y + 80,
+  });
+ 
+  const getTopPoint = (node) => ({
+    x: node.position.x + 120,
+    y: node.position.y,
+  });
+ 
+  const onNodeDragStop = (event, draggedNode) => {
+ 
+    if (!AUTO_TYPES.includes(draggedNode.type))
+      return;
+ 
+    const latestNode = nodes.find(
+      n => n.id === draggedNode.id
+    );
+ 
+    if (!latestNode)
+      return;
+ 
+    const sourcePoint = getBottomPoint(
+      latestNode
+    );
+ 
+    const targetNode = nodes.find((node) => {
+ 
+      if (node.id === draggedNode.id)
+        return false;
+ 
+      if (!AUTO_TYPES.includes(node.type))
+        return false;
+ 
+      const targetPoint = getTopPoint(node);
+ 
+      const distance = Math.sqrt(
+        Math.pow(
+          sourcePoint.x - targetPoint.x,
+          2
+        ) +
+        Math.pow(
+          sourcePoint.y - targetPoint.y,
+          2
+        )
+      );
+ 
+      return distance < CONNECT_DISTANCE;
+    });
+ 
+    // ---------- CONNECT ----------
+ 
+    if (targetNode) {
+ 
+      // Determine upper and lower nodes based on Y position
+      const upperNode = latestNode.position.y < targetNode.position.y
+        ? latestNode
+        : targetNode;
+ 
+      const lowerNode = latestNode.position.y < targetNode.position.y
+        ? targetNode
+        : latestNode;
+ 
+      // Check if auto edge already exists between these two (direction: upper -> lower)
+      const exists = edges.some(
+        edge =>
+          edge.data?.auto &&
+          edge.source === upperNode.id &&
+          edge.target === lowerNode.id
+      );
+ 
+      if (!exists) {
+ 
+        const newEdge = {
+          id: `auto-${upperNode.id}-${lowerNode.id}`,
+          source: upperNode.id,
+          target: lowerNode.id,
+          hidden: true,
+          data: {
+            auto: true,
+          },
+        };
+ 
+        setEdges(prev => [
+          ...prev,
+          newEdge,
+        ]);
+ 
+        // Add linkedFrom badge to the lower node only
+        setNodes(prev =>
+          prev.map(node =>
+            node.id === lowerNode.id
+              ? {
+                ...node,
+                data: {
+                  ...node.data,
+                  linkedFrom: upperNode.id,
+                },
+              }
+              : node
+          )
+        );
+      }
+ 
+      return;
+    }
+ 
+    // ---------- DISCONNECT REMOVED (STEP 1) ----------
+    // Dragging far away now does nothing.
+  };
+ 
+  const disconnectNode = (nodeId) => {
+ 
+    setEdges((prev) =>
+      prev.filter(
+        (edge) =>
+          !(
+            edge.target === nodeId &&
+            edge.data?.auto
+          )
+      )
+    );
+ 
+    setNodes((prev) =>
+      prev.map((node) =>
+        node.id === nodeId
+          ? {
+            ...node,
+            data: {
+              ...node.data,
+              linkedFrom: null,
+            },
+          }
+          : node
+      )
+    );
+  };
+ 
+  // ---------- onNodesChange (STEP 2) ----------
+  const onNodesChange = (changes) => {
+ 
+    setNodes((nds) => {
+ 
+      let updatedNodes =
+        applyNodeChanges(changes, nds);
+ 
+      changes.forEach((change) => {
+ 
+        if (
+          change.type === "position" &&
+          change.dragging
+        ) {
+ 
+          const movedNode =
+            updatedNodes.find(
+              n => n.id === change.id
+            );
+ 
+          if (!movedNode)
+            return;
+ 
+          edges.forEach((edge) => {
+ 
+            if (
+              edge.data?.auto
+            ) {
+ 
+              // source moved
+              if (
+                edge.source === movedNode.id
+              ) {
+ 
+                updatedNodes =
+                  updatedNodes.map(
+                    node =>
+                      node.id === edge.target
+                        ? {
+                          ...node,
+                          position: {
+                            x:
+                              node.position.x +
+                              change.position.x,
+                            y:
+                              node.position.y +
+                              change.position.y,
+                          },
+                        }
+                        : node
+                  );
+              }
+ 
+              // target moved
+              if (
+                edge.target === movedNode.id
+              ) {
+ 
+                updatedNodes =
+                  updatedNodes.map(
+                    node =>
+                      node.id === edge.source
+                        ? {
+                          ...node,
+                          position: {
+                            x:
+                              node.position.x +
+                              change.position.x,
+                            y:
+                              node.position.y +
+                              change.position.y,
+                          },
+                        }
+                        : node
+                  );
+              }
+            }
+          });
+        }
+      });
+ 
+      return updatedNodes;
+    });
+  };
+ 
+
+
+
 
   const addNode = (type, position = null) => {
     const nodeTypeMap = {
@@ -68,6 +310,7 @@ const [flowName, setFlowName] = useState("");
       "End Session": "endSessionNode",
       "End Flow": "endFlowNode",
       "Form": "formNode",
+      "Flow Transfer": "flowTransferNode",
     };
     const nodeType = nodeTypeMap[type] || "default";
 
@@ -106,6 +349,8 @@ const [flowName, setFlowName] = useState("");
       delayValue: 0,
       delayUnit: "",
       formFields: [],
+      targetFlowId: "",
+targetFlowName: "",
     };
 
     switch (type) {
@@ -161,6 +406,10 @@ const [flowName, setFlowName] = useState("");
           { label: "Full Name", type: "text", variable: "full_name", required: true },
         ];
         break;
+      case "Flow Transfer":
+  baseData.targetFlowId = "";
+  baseData.targetFlowName = "";
+  break;
       default:
         break;
     }
@@ -174,7 +423,11 @@ const [flowName, setFlowName] = useState("");
 
     setNodes((prev) => [...prev, newNode]);
   };
-
+const openPreview = () => {
+  setPreviewNodes(nodes);
+  setPreviewEdges(edges);
+  setPreviewOpen(true);
+};
   const onDragStart = (event, nodeType) => {
     event.dataTransfer.setData("application/reactflow", nodeType);
     event.dataTransfer.effectAllowed = "move";
@@ -222,6 +475,35 @@ const [flowName, setFlowName] = useState("");
 
     return cleaned;
   };
+useEffect(() => {
+  const draft = localStorage.getItem("flowBuilderDraft");
+
+  if (draft) {
+    try {
+      const parsed = JSON.parse(draft);
+
+      setNodes(parsed.nodes || []);
+      setEdges(parsed.edges || []);
+      setFlowName(parsed.flowName || "");
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  setIsRestored(true);
+}, []);
+useEffect(() => {
+  if (!isRestored) return;
+
+  localStorage.setItem(
+    "flowBuilderDraft",
+    JSON.stringify({
+      nodes,
+      edges,
+      flowName,
+    })
+  );
+}, [nodes, edges, flowName, isRestored]);
 
   // ---------- SAVE FLOW TO Mongo ----------
   const saveFlow = async () => {
@@ -274,9 +556,11 @@ console.log(
       const result = await response.json();
 
       if (result.success) {
-        alert("Flow saved successfully");
-        loadFlows();
-      } else {
+  localStorage.removeItem("flowBuilderDraft");
+
+  alert("Flow saved successfully");
+  loadFlows();
+}else {
         alert(result.message);
       }
     } catch (error) {
@@ -325,7 +609,34 @@ console.log(
       console.error(error);
     }
   };
+const loadPreviewFlowById = async (flowId) => {
+  try {
+    const response = await fetch(
+      `http://localhost:7821/api/admin/flow/${flowId}`
+    );
 
+    const result = await response.json();
+ console.log("FLOW LOADED:", result.data.name);
+    console.log("NODES:", result.data.nodes);
+    console.log("EDGES:", result.data.edges);
+    if (!result.success) return;
+
+    const convertedNodes = (result.data.nodes || []).map(
+      (node) => ({
+        ...node,
+        type:
+          reverseNodeTypeMap[node.type] ||
+          node.type,
+      })
+    );
+
+    setPreviewNodes(convertedNodes);
+    setPreviewEdges(result.data.edges || []);
+
+  } catch (err) {
+    console.error(err);
+  }
+};
   // ---------- EXPORT META JSON ----------
   const handleExportMetaJson = () => {
     try {
@@ -433,7 +744,8 @@ console.log(
       loadFlows();
     }
   }, [userId]);
-
+console.log("PARENT NODES:", nodes);
+console.log("PARENT LENGTH:", nodes?.length);
   return (
     <>
       <div className="header">Flow Builder</div>
@@ -444,7 +756,7 @@ console.log(
           const flowId = prompt("Enter Flow ID to load:");
           if (flowId) loadFlowById(flowId);
         }}>Load</button> */}
-        <button onClick={() => setPreviewOpen(true)}>PREVIEW</button>
+        <button onClick={openPreview}>PREVIEW</button>
         <button onClick={handleExportMetaJson}>EXPORT META JSON</button>
         <button onClick={() => fileInputRef.current.click()}>
           IMPORT META JSON
@@ -476,6 +788,10 @@ console.log(
           edges={edges}
           setEdges={setEdges}
           setSelectedNode={setSelectedNode}
+          onNodeDragStop={onNodeDragStop}
+          disconnectNode={disconnectNode}
+          onNodesChange={onNodesChange}  
+ 
           addNode={addNode}
           setFitFunction={setFitFunction}
         />
@@ -484,15 +800,17 @@ console.log(
           selectedNode={selectedNode}
           setNodes={setNodes}
           setSelectedNode={setSelectedNode}
+          flowsList={flowsList}
         />
       </div>
 
       <PreviewModal
-        isOpen={previewOpen}
-        onClose={() => setPreviewOpen(false)}
-        nodes={nodes}
-        edges={edges}
-      />
+  isOpen={previewOpen}
+  onClose={() => setPreviewOpen(false)}
+ nodes={previewNodes}
+    edges={previewEdges}
+    loadFlowById={loadPreviewFlowById}
+/>
     </>
   );
 }

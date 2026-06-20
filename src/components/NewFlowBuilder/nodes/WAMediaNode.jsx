@@ -11,7 +11,29 @@ function WAMediaNode({ data }) {
             <div className="wa-media-title">
                 🟠 WA Media
             </div>
-            
+            {data.linkedFrom && (
+                <div
+                    onClick={() =>
+                        data.disconnectNode(
+                            data.nodeId
+                        )
+                    }
+                    style={{
+                        marginTop: "4px",
+                        padding: "2px 4px",
+                        background: "#dcfce7",
+                        border: "1px solid #22c55e",
+                        color: "#15803d",
+                        borderRadius: "20px",
+                        fontSize: "8px",
+                        cursor: "pointer",
+                        display: "inline-block",
+                    }}
+                >
+                    🔗 Linked
+                </div>
+            )}
+ 
             <div className="wa-media-url">
                 {data.mediaType?.toUpperCase()}
                 {" → "}
@@ -35,4 +57,5 @@ function WAMediaNode({ data }) {
 }
  
 export default WAMediaNode;
+ 
  

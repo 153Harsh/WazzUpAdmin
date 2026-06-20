@@ -31,7 +31,7 @@
 .flow-library-page {
   width: 100%;
   height: 100%;
-  margin-left: 30px;
+  margin-left: 2px;
   padding: 0;
   background: #f8fafc;
 
@@ -52,16 +52,16 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 24px;
+  padding: 10px 10px;
   background: white;
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-sm);
   border: 1px solid var(--gray-200);
-  margin-bottom: 20px;
+  margin-bottom: 4px;
 }
 
 .flow-library-page-title {
-  font-size: 22px;
+  font-size: 18px;
   font-weight: 800;
   color: var(--gray-900);
   letter-spacing: -0.3px;
@@ -86,11 +86,11 @@
   display: flex;
   align-items: center;
   gap: 20px;
-  padding: 12px 20px;
+  padding: 4px 20px;
   background: white;
   border-radius: var(--radius-sm);
   box-shadow: var(--shadow-sm);
-  margin-bottom: 20px;
+  margin-bottom: 4px;
   border: 1px solid var(--gray-200);
 }
 
@@ -332,7 +332,7 @@
   font-size: 12px;
   color: var(--gray-500);
   margin-bottom: 10px;
-  display: -webkit-box;
+  display: -webkit-box; 
   -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
   overflow: hidden;
@@ -352,7 +352,7 @@
   padding: 8px 0;
   border-top: 1px solid var(--gray-100);
   border-bottom: 1px solid var(--gray-100);
-  margin-bottom: 12px;
+  /* margin-bottom: 2px;*/
 }
 
 .flow-library-card-trigger {
@@ -829,4 +829,309 @@
 .settings-content::-webkit-scrollbar-thumb {
   background: var(--gray-300);
   border-radius: 20px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* View Toggle Styles */
+.flow-library-view-toggle {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  /* margin: 0 0; */
+  /* padding: 0px; */
+  background: #f0f2f5;
+  border-radius: 8px;
+  width: fit-content;
+  margin-left: 58%;
+  
+}
+
+.view-toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+}
+
+.view-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.5);
+  color: #374151;
+}
+
+.view-toggle-btn.active {
+  background: white;
+  color: #2563eb;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.view-icon {
+  font-size: 16px;
+}
+
+/* Container for flows */
+.flow-library-container {
+  width: 100%;
+}
+
+/* Grid View (Cards) */
+.flow-library-container.grid-view {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+/* List View */
+.flow-library-container.list-view {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* List Item Styles */
+.flow-library-list-item {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 4px 20px;
+  transition: all 0.2s ease;
+}
+
+.flow-library-list-item:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-color: #d1d5db;
+}
+
+.flow-list-thumbnail {
+  flex-shrink: 0;
+  width: 60px;
+  height: 60px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #f3f4f6;
+}
+
+.flow-list-thumbnail-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.flow-list-thumbnail-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 700;
+  color: #9ca3af;
+  background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+}
+
+.flow-list-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.flow-list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.flow-list-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #111827;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.flow-list-description {
+  font-size: 14px;
+  color: #6b7280;
+  margin-bottom: 8px;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.flow-list-description.empty {
+  color: #9ca3af;
+  font-style: italic;
+}
+
+.flow-list-meta {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  font-size: 13px;
+}
+
+.flow-list-trigger {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.flow-list-date {
+  color: #6b7280;
+}
+
+.flow-list-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .flow-library-list-item {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .flow-list-thumbnail {
+    width: 100%;
+    height: 120px;
+  }
+
+  .flow-list-actions {
+    justify-content: flex-end;
+  }
+
+  .flow-library-container.grid-view {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+/* Delete button styles for card view */
+.flow-thumbnail-wrapper {
+  position: relative;
+}
+
+.flow-delete-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(239, 68, 68, 0.9);
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  opacity: 0;
+  z-index: 10;
+}
+
+.flow-library-card:hover .flow-delete-btn {
+  opacity: 1;
+}
+
+.flow-delete-btn:hover {
+  background: #dc2626;
+  transform: scale(1.1);
+}
+
+.flow-delete-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Delete button for list view */
+.flow-library-card-btn-delete {
+  background: #ef4444;
+  color: white;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.flow-library-card-btn-delete:hover:not(:disabled) {
+  background: #dc2626;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+}
+
+.flow-library-card-btn-delete:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Optional: Add a subtle animation when deleting */
+.flow-library-card.deleting,
+.flow-library-list-item.deleting {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+
+
+
+
+
+
+.flow-connected-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.flow-connected-badge {
+  background: #eef6ff;
+  color: #2563eb;
+  border: 1px solid #bfdbfe;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 500;
 }

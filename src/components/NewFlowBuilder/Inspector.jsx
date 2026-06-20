@@ -3,8 +3,8 @@ import FormNode from "./nodes/FormNode";
 const inspectorStyles = `
   /* ─── Inspector Shell ─────────────────────────────────────── */
   .inspector {
-    width: 340px;
-    min-width: 340px;
+    width: 320px;
+    min-width: 320px;
     background: #ffffff;
     border-left: 1px solid #e5e7eb;
     height: 100%;
@@ -25,7 +25,7 @@ const inspectorStyles = `
   }
 
   .insp-header-title {
-    font-size: 21px;
+    font-size: 16px;
     font-weight: 700;
     color: #1e293b;
     letter-spacing: .04em;
@@ -409,9 +409,13 @@ const NODE_COLORS = {
         border: "#843333",
         bg: "#fdf2f2",
     },
+    flowTransferNode: {
+    border: "#7c3aed",
+    bg: "#f3e8ff",
+},
 };
 
-function Inspector({ selectedNode, setNodes, setSelectedNode }) {
+function Inspector({ selectedNode, setNodes, setSelectedNode, flowsList }) {
 
     if (!selectedNode) {
         return (
@@ -1234,7 +1238,57 @@ function Inspector({ selectedNode, setNodes, setSelectedNode }) {
                             </div>
                         </div>
                     )}
+                    {selectedNode?.type === "flowTransferNode" && (
+  <div className="card-section">
+    <p className="card-section-title">
+      Flow Transfer
+    </p>
 
+    <div className="field-group">
+      <label className="insp-label">
+        Target Flow ID
+      </label>
+
+      <select
+  className="insp-select"
+  value={selectedNode.data.targetFlowId || ""}
+  onChange={(e) => {
+    const selectedFlow = flowsList.find(
+      (flow) => flow._id === e.target.value
+    );
+
+    updateNode(
+      "targetFlowId",
+      selectedFlow?._id || ""
+    );
+
+    updateNode(
+      "targetFlowName",
+      selectedFlow?.name || ""
+    );
+  }}
+>
+  <option value="">
+    Select Target Flow
+  </option>
+
+  {flowsList
+    ?.filter(
+      (flow) =>
+        flow.name !== selectedNode.data.flowName
+    )
+    .map((flow) => (
+      <option
+        key={flow._id}
+        value={flow._id}
+      >
+        {flow.name}
+      </option>
+    ))}
+</select>
+    </div>
+  </div>
+)}
                 </div>
             </div>
         </>

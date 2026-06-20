@@ -1,6 +1,8 @@
 import { useEffect, useState, useRef } from "react";
 
-function PreviewModal({ isOpen, onClose, nodes, edges,trigger, }) {
+function PreviewModal({ isOpen, onClose, nodes, edges,trigger,loadFlowById }) {
+    const initializedRef = useRef(false);
+const transferredRef = useRef(false);
     const [messages, setMessages] = useState([]);
     const [currentNode, setCurrentNode] = useState(null);
     const [variables, setVariables] = useState({});
@@ -241,6 +243,16 @@ function PreviewModal({ isOpen, onClose, nodes, edges,trigger, }) {
     // ---------- execute a node by ID ----------
     const executeNode = (nodeId) => {
         const nextNode = nodes.find((node) => node.id === nodeId);
+        console.log("EXECUTING:", nextNode);
+        console.log(
+  "TEXT NODE ID:",
+  nextNode.id
+);
+
+console.log(
+  "EDGE SOURCES:",
+  edges.map(e => e.source)
+);
         if (!nextNode) return;
         setTimeout(() => {
             const interactiveTypes = ["waListNode", "waButtonsNode", "inputNode", "formNode"];
@@ -339,7 +351,23 @@ function PreviewModal({ isOpen, onClose, nodes, edges,trigger, }) {
             moveToNextNode(currentNode);
             return;
         }
+        if (currentNode.type === "flowTransferNode") {
 
+    console.log(
+      "TRANSFER TO:",
+      currentNode.data.targetFlowId
+    );
+
+    transferredRef.current = true;
+
+    setCurrentNode(null);
+
+    loadFlowById(
+      currentNode.data.targetFlowId
+    );
+
+    return;
+}
         if (currentNode.type === "endFlowNode") {
             setCurrentNode(null);
             return;
@@ -410,20 +438,70 @@ function PreviewModal({ isOpen, onClose, nodes, edges,trigger, }) {
     }, [currentNode]);
 
     // reset & start flow when modal opens
+const hasTrigger =
+  typeof trigger === "string" &&
+  trigger.trim() !== "" &&
+  trigger.trim().toLowerCase() !== "undefined";
 useEffect(() => {
-    if (!isOpen || nodes.length === 0) return;
 
-    setMessages([]);
-    setCurrentNode(null);
-    setVariables({});
-    setInputValue("");
-    setActiveList(null);
-    setIsLoading(false);
-    setIsDelaying(false);
-    setActiveForm(null);
-    setFormValues({});
-}, [isOpen]);
+    if (!isOpen) {
+        initializedRef.current = false;
+        transferredRef.current = false;
+        return;
+    }
 
+    if (!nodes?.length) return;
+
+    // FIRST OPEN ONLY
+    if (!initializedRef.current) {
+
+        initializedRef.current = true;
+
+        setMessages([]);
+        setVariables({});
+        setInputValue("");
+        setActiveList(null);
+    }
+
+    const startNode = nodes.find(
+        n => n.type === "startNode"
+    );
+
+    if (!startNode) return;
+
+    const startEdge = edges.find(
+        e => e.source === startNode.id
+    );
+
+    if (!startEdge) return;
+
+    // FLOW TRANSFER
+    if (transferredRef.current) {
+
+        transferredRef.current = false;
+
+        setTimeout(() => {
+            executeNode(startEdge.target);
+        }, 300);
+
+        return;
+    }
+
+    // NORMAL OPEN
+    if (!hasTrigger) {
+
+        setTimeout(() => {
+            executeNode(startEdge.target);
+        }, 300);
+    }
+
+}, [nodes, edges, isOpen,trigger]);
+useEffect(() => {
+   console.log(
+      "PREVIEW NODES CHANGED",
+      nodes.length
+   );
+}, [nodes]);
     // ---------- handlers ----------
     const handleButtonClick = (buttonText, buttonIndex) => {
         if (!currentNode) return;
